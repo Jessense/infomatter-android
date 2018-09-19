@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,10 +32,13 @@ public class MainActivity extends AppCompatActivity{
     RecyclerView recyclerView;
     EntryAdapter adapter;
     User user;
+    public SwipeRefreshLayout swipeRefresh;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
+        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         user = new User(getApplicationContext());
         if (!user.getLogined()){
             Log.d("MainActivity", "onCreate: logined?"+user.getLogined().toString());
@@ -51,6 +55,12 @@ public class MainActivity extends AppCompatActivity{
             entryList = new ArrayList<>();
             getEntryList();
         }
+        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                getEntryList();
+            }
+        });
 
     }
 
@@ -95,6 +105,7 @@ public class MainActivity extends AppCompatActivity{
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                swipeRefresh.setRefreshing(false);
             }
         }).start();
     }
@@ -127,8 +138,12 @@ public class MainActivity extends AppCompatActivity{
 
         switch (item.getItemId()){
             case R.id.menu_subscribe:
+                Intent intent = new Intent(MainActivity.this, SubscribeActivity.class);
+                startActivity(intent);
                 break;
             case R.id.menu_logout:
+                user.setLogined(false);
+                finish();
                 break;
             default:
                 break;
