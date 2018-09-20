@@ -4,10 +4,21 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".SubscribeActivity">
+
+    <EditText
+        android:id = "@+id/source-search"
+        android:layout_width = "match_parent"
+        android:layout_height = "wrap_content"
+        android:inputType="text"
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/source_list"
+        android:paddingTop="120px"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

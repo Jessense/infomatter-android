@@ -19,14 +19,20 @@ import android.widget.TextView;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 
+import okhttp3.FormBody;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.content.ContentValues.TAG;
@@ -35,6 +41,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
     private List<Source> mSourceList;
     private Context context;
     private User user;
+    private Boolean isSearchingRSS;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView sourceName;
@@ -46,10 +53,11 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         }
     }
 
-    public SourceAdapter (List<Source> sourceList, Context context) {
+    public SourceAdapter (List<Source> sourceList, Boolean isSearchingRSS,Context context) {
         this.mSourceList = sourceList;
         this.context = context;
         this.user = new User(context);
+        this.isSearchingRSS = isSearchingRSS;
     }
 
 
@@ -67,7 +75,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
 
         holder.sourceName.setText(source.getName());
         GetRelationTask getRelationTask = new GetRelationTask(holder.followButton);
-        getRelationTask.executeOnExecutor(Executors.newCachedThreadPool(), user.getId(), source.getId());
+        getRelationTask.executeOnExecutor(Executors.newCachedThreadPool(), source);
 
 
 //        getRelationRequest(user.getId(), source.getId());
@@ -82,127 +90,105 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         holder.followButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                FollowTask followTask = new FollowTask(holder.followButton);
                 String curState = holder.followButton.getText().toString();
                 String action;
                 if(curState.equals("following")) {
                     action = "unfollow";
-                } else {
+                    FollowTask followTask = new FollowTask(holder.followButton);
+                    followTask.executeOnExecutor(Executors.newCachedThreadPool(), user.getId(), source.getId(), action);
+                } else if(curState.equals("follow")){
                     action = "follow";
+                    FollowTask followTask = new FollowTask(holder.followButton);
+                    followTask.executeOnExecutor(Executors.newCachedThreadPool(), user.getId(), source.getId(), action);
+                } else if(curState.equals("add")){
+                    AddTask addTask = new AddTask(holder.followButton);
+                    addTask.executeOnExecutor(Executors.newCachedThreadPool(), source);
                 }
-                followTask.executeOnExecutor(Executors.newCachedThreadPool(), user.getId(), source.getId(), action);
             }
         });
 
 
     }
 
-//    private void getRelationRequest(final String user_id, final String source_id) {
-//        final Boolean[] result = new Boolean[1];
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    OkHttpClient client = new OkHttpClient();
-//                    Request request = new Request.Builder()
-//                            .url("http://188.131.178.76:3000/users/isfollowing")
-//                            .addHeader("user_id", user_id)
-//                            .addHeader("source_id", source_id)
-//                            .build();
-//                    Response response = client.newCall(request).execute();
-//                    String responseData = response.body().string();
-//                    result[0] = Boolean.parseBoolean(responseData);
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
-//    }
-//
-//
-//
-//    private void getFollowRequest(final String user_id, final String source_id) {
-//        final String[] result = new String[1];
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    OkHttpClient client = new OkHttpClient();
-//                    Request request = new Request.Builder()
-//                            .url("http://188.131.178.76:3000/users/follow")
-//                            .addHeader("user_id", user_id)
-//                            .addHeader("source_id", source_id)
-//                            .build();
-//                    Response response = client.newCall(request).execute();
-//                    result[0] = response.body().string();
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
-//    }
-//
-//    private void getUnfollowRequest(final String user_id, final String source_id) {
-//        final String[] result = new String[1];
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    OkHttpClient client = new OkHttpClient();
-//                    Request request = new Request.Builder()
-//                            .url("http://188.131.178.76:3000/users/unfollow")
-//                            .addHeader("user_id", user_id)
-//                            .addHeader("source_id", source_id)
-//                            .build();
-//                    Response response = client.newCall(request).execute();
-//                    String result = response.body().string();
-//
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
-//    }
 
-    class GetRelationTask extends AsyncTask<String, Void, Boolean> {
+
+    class GetRelationTask extends AsyncTask<Source, Void, String> {
         private Button followbtn;
-        String user_id;
-        String source_id;
+        Source source;
         public GetRelationTask(Button btn) {
             followbtn = btn;
         }
 
         @Override
-        protected Boolean doInBackground(String... params) {
-            user_id = params[0];
-            source_id = params[1];
+        protected String doInBackground(Source... params) {
+            source = params[0];
             try {
-                OkHttpClient client = new OkHttpClient();
-                Request request = new Request.Builder()
-                        .url("http://188.131.178.76:3000/users/isfollowing")
-                        .addHeader("user_id", user_id)
-                        .addHeader("source_id", source_id)
-                        .build();
-                Response response = client.newCall(request).execute();
-                String responseData = response.body().string();
-                Boolean result = Boolean.parseBoolean(responseData);
+                String result;
+                if (isSearchingRSS) {
+                    HttpUrl request_url = new HttpUrl.Builder()
+                            .scheme("http")
+                            .host("188.131.178.76")
+                            .port(3000)
+                            .addPathSegment("sources")
+                            .addPathSegment("search")
+                            .addQueryParameter("link", source.getLink())
+                            .build();
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url(request_url)
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    String responseData = response.body().string();
+                    Log.d("SubscribeActivity", "doInBackground: responseRSS:"+responseData);
+                    if (responseData.equals("NOTFOUND")) {
+                        result = "add";
+                        Log.d("SubscribeActivity", "doInBackground: relationResult="+result);
+                    } else {
+                        Gson gson = new Gson();
+                        List<Source> sourceList = gson.fromJson(responseData, new TypeToken<List<Source>>(){}.getType());
+                        source.setId(sourceList.get(0).getId());
+                        OkHttpClient client2 = new OkHttpClient();
+                        Request request2 = new Request.Builder()
+                                .url("http://188.131.178.76:3000/users/isfollowing")
+                                .addHeader("user_id", user.getId())
+                                .addHeader("source_id", source.getId())
+                                .build();
+                        Response response2 = client2.newCall(request2).execute();
+                        String responseData2 = response2.body().string();
+                        Boolean isFollowing = Boolean.parseBoolean(responseData2);
+                        if (isFollowing) {
+                            result = "following";
+                        } else {
+                            result = "follow";
+                        }
+                    }
+                } else {
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url("http://188.131.178.76:3000/users/isfollowing")
+                            .addHeader("user_id", user.getId())
+                            .addHeader("source_id", source.getId())
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    String responseData = response.body().string();
+                    Boolean isFollowing = Boolean.parseBoolean(responseData);
+                    if (isFollowing) {
+                        result = "following";
+                    } else {
+                        result = "follow";
+                    }
+                }
                 return result;
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return false;
+            return null;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            if (aBoolean) {
-                followbtn.setText("following");
-            } else {
-                followbtn.setText("follow");
-            }
+        protected void onPostExecute(String text) {
+            super.onPostExecute(text);
+            followbtn.setText(text);
         }
     }
 
@@ -246,6 +232,49 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                     followbtn.setText("follow");
                 }
             }
+        }
+    }
+
+    class AddTask extends AsyncTask<Source, Void, Integer> {
+        private Button followbtn;
+        Source source;
+        public AddTask(Button btn) {
+            followbtn = btn;
+        }
+
+        @Override
+        protected Integer doInBackground(Source... params) {
+            source = params[0];
+            try {
+                OkHttpClient client = new OkHttpClient();
+                RequestBody formBody = new FormBody.Builder()
+                        .add("name", source.getName())
+                        .add("link",source.getLink())
+                        .add("feedURL", source.getFeedUrl())
+                        .build();
+
+                Request request = new Request.Builder()
+                        .url("http://188.131.178.76:3000/sources/add")
+                        .post(formBody)
+                        .build();
+                Response response = client.newCall(request).execute();
+                String responseData = response.body().string();
+                Gson gson = new Gson();
+                JSONArray jsonArray = new JSONArray(responseData);
+                JSONObject jsonObject = jsonArray.getJSONObject(0);
+                Integer result = jsonObject.getInt("LAST_INSERT_ID()");
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Integer result) {
+            super.onPostExecute(result);
+            source.setId(result.toString());
+            followbtn.setText("follow");
         }
     }
 
