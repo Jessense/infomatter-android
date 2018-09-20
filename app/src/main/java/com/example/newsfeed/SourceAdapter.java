@@ -250,7 +250,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                 RequestBody formBody = new FormBody.Builder()
                         .add("name", source.getName())
                         .add("link",source.getLink())
-                        .add("feedURL", source.getFeedUrl())
+                        .add("feedUrl", source.getFeedUrl())
                         .build();
 
                 Request request = new Request.Builder()
