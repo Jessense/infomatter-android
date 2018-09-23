@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_subscribe" android:title="subscribe"/>
-    <item android:id="@+id/menu_logout" android:title="logout"/>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools" tools:context=".MainActivity">
+    <item android:id="@+id/action_search"
+        android:title="Search"
+        android:icon="@drawable/ic_action_search"
+        app:showAsAction="ifRoom" />
+    <item android:id="@+id/action_logout"
+        android:title="Logout"
+        android:icon="@drawable/ic_action_more"
+        app:showAsAction="never" />
 </menu>
