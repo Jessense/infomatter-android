@@ -24,10 +24,10 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
     private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView entryView;
+        public TextView entryTitle;
         public ViewHolder(View view) {
             super(view);
-            entryView = (TextView) view.findViewById(R.id.entry_name);
+            entryTitle = (TextView) view.findViewById(R.id.entry_name);
         }
     }
 
@@ -48,9 +48,9 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Entry entry = mEntryList.get(position);
 
-        holder.entryView.setText(entry.getTitle());
+        holder.entryTitle.setText(entry.getTitle());
 
-        holder.entryView.setOnClickListener(new View.OnClickListener() {
+        holder.entryTitle.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = entry.getLink();
