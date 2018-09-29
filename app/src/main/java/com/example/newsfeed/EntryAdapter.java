@@ -25,9 +25,11 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView entryTitle;
+        public TextView entrySourceTime;
         public ViewHolder(View view) {
             super(view);
             entryTitle = (TextView) view.findViewById(R.id.entry_name);
+            entrySourceTime = (TextView) view.findViewById(R.id.entry_source_time);
         }
     }
 
@@ -49,6 +51,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
         final Entry entry = mEntryList.get(position);
 
         holder.entryTitle.setText(entry.getTitle());
+        holder.entrySourceTime.setText(entry.getSourceId() + "/" + entry.getTime());
 
         holder.entryTitle.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -60,7 +63,8 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
                     Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_share);
                     Intent intent = new Intent(Intent.ACTION_SEND);
                     intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, "http://www.codepath.com");
+                    intent.putExtra(Intent.EXTRA_TEXT, entry.getLink());
+                    intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
                     int requestCode = 100;
 
                     PendingIntent pendingIntent = PendingIntent.getActivity(view.getContext(),
