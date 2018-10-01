@@ -8,16 +8,37 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.AsyncTask;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> {
     private List<Entry> mEntryList;
@@ -26,10 +47,14 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView entryTitle;
         public TextView entrySourceTime;
+        public ImageView entryPhoto;
+        public CardView entryCard;
         public ViewHolder(View view) {
             super(view);
             entryTitle = (TextView) view.findViewById(R.id.entry_name);
             entrySourceTime = (TextView) view.findViewById(R.id.entry_source_time);
+            entryPhoto = (ImageView) view.findViewById(R.id.entry_cover);
+            entryCard = (CardView) view.findViewById(R.id.entry_card);
         }
     }
 
@@ -46,14 +71,24 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
         return holder;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         final Entry entry = mEntryList.get(position);
 
         holder.entryTitle.setText(entry.getTitle());
-        holder.entrySourceTime.setText(entry.getSourceId() + "/" + entry.getTime());
+        holder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
+        if (entry.getPhoto() != null && entry.getPhoto() != "") {
+            Picasso.get()
+                    .load(entry.getPhoto())
+                    .into(holder.entryPhoto);
+        } else {
+            holder.entryPhoto.setVisibility(View.INVISIBLE);
+        }
 
-        holder.entryTitle.setOnClickListener(new View.OnClickListener() {
+//        if (entry.getPhoto() != null)
+//            holder.entryPhoto.setImageURI(Uri.parse(entry.getPhoto()));
+        holder.entryCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String url = entry.getLink();
