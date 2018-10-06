@@ -85,6 +85,15 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
 //            holder.followButton.setText("follow");
 //        }
 
+        holder.sourceName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(context, SourceActivity.class);
+                intent.putExtra("source_id", source.getId());
+                context.startActivity(intent);
+            }
+        });
+
 
 
         holder.followButton.setOnClickListener(new View.OnClickListener() {

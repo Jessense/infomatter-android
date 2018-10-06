@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    android:targetSandboxVersion="1"
-    package="com.example.newsfeed">
+    package="com.example.newsfeed"
+    android:targetSandboxVersion="1">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -22,7 +22,8 @@
         </activity>
         <activity android:name=".WebviewActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".SubscribeActivity"></activity>
+        <activity android:name=".SubscribeActivity" />
+        <activity android:name=".SourceActivity"></activity>
     </application>
 
 </manifest>

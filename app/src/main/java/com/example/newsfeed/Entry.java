@@ -50,28 +50,41 @@ public class Entry {
     public String geLocalPubTime() {
         Date now = new Date();
         LocalDateTime localDate = now.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        int cur_year  = localDate.getYear();
-        int cur_month = localDate.getMonthValue();
-        int cur_day   = localDate.getDayOfMonth();
-        int cur_hour = localDate.getHour();
+        String cur_year  = String.format("%04d", localDate.plusHours(8).getYear());
+        String cur_month = String.format("%02d", localDate.plusHours(8).getMonthValue());
+        String cur_day   = String.format("%02d", localDate.plusHours(8).getDayOfMonth());
+        String cur_hour = String.format("%02d", localDate.plusHours(8).getHour());
 
 
         DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
         TemporalAccessor accessor = timeFormatter.parse(time);
         Date pubDate = Date.from(Instant.from(accessor));
         LocalDateTime localPubDate = pubDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        int pub_year  = localPubDate.plusHours(8).getYear();
-        int pub_month = localPubDate.plusHours(8).getMonthValue();
-        int pub_day   = localPubDate.plusHours(8).getDayOfMonth();
-        int pub_hour = localPubDate.plusHours(8).getHour();
-        int pub_minute = localPubDate.getMinute();
-
-        if (cur_year == pub_year && cur_month == pub_month && cur_day == pub_day) {
-            return Integer.toString(pub_hour) + ":" + Integer.toString(pub_minute);
-        } else if(cur_year == pub_year){
-            return Integer.toString(pub_month) + "-" + Integer.toString(pub_day) +" " + Integer.toString(pub_hour) + ":" + Integer.toString(pub_minute);
+        String pub_year;
+        String pub_month;
+        String pub_day;
+        String pub_hour;
+        String pub_minute = String.format("%02d", localPubDate.getMinute());
+        if (localPubDate.plusHours(8).isAfter(localDate)) {
+            pub_year  = String.format("%04d", localPubDate.getYear());
+            pub_month = String.format("%02d", localPubDate.getMonthValue());
+            pub_day   = String.format("%02d", localPubDate.getDayOfMonth());
+            pub_hour = String.format("%02d", localPubDate.getHour());
         } else {
-            return Integer.toString(pub_year) + " " + Integer.toString(pub_month) + "-" + Integer.toString(pub_day);
+            pub_year  = String.format("%04d", localPubDate.plusHours(8).getYear());
+            pub_month = String.format("%02d", localPubDate.plusHours(8).getMonthValue());
+            pub_day   = String.format("%02d", localPubDate.plusHours(8).getDayOfMonth());
+            pub_hour = String.format("%02d", localPubDate.plusHours(8).getHour());
+        }
+
+
+
+        if (cur_year.equals(pub_year) && cur_month.equals(pub_month) && cur_day.equals(pub_day)) {
+            return pub_hour + ":" + pub_minute;
+        } else if(cur_year.equals(pub_year)){
+            return pub_month + "-" + pub_day + " " + pub_hour + ":" + pub_minute;
+        } else {
+            return pub_year + " " + pub_month + "-" + pub_day;
         }
 
 
