@@ -37,6 +37,8 @@
                 android:textColor="@color/black"
                 android:textSize="16dp"
                 android:layout_alignParentTop="true"
+                android:layout_alignParentLeft="true"
+
                 android:layout_toLeftOf="@+id/entry_cover"/>
 
             <TextView

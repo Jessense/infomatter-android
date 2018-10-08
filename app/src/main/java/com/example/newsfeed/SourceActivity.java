@@ -24,7 +24,7 @@ public class SourceActivity extends AppCompatActivity {
     EntryAdapter adapter;
     User user;
     String source_id;
-    public SwipeRefreshLayout swipeRefresh;
+//    public SwipeRefreshLayout swipeRefresh;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,15 +38,15 @@ public class SourceActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         entryList = new ArrayList<>();
         getEntryList(source_id);
-        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh2);
-        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
-        user = new User(getApplicationContext());
-        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                getEntryList(source_id);
-            }
-        });
+//        swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh2);
+//        swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+//        user = new User(getApplicationContext());
+//        swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+//            @Override
+//            public void onRefresh() {
+//                getEntryList(source_id);
+//            }
+//        });
     }
 
     private void getEntryList(final String source_id) {
@@ -61,14 +61,14 @@ public class SourceActivity extends AppCompatActivity {
                             .build();
                     Response response = client.newCall(request).execute();
                     String responseData = response.body().string();
-                    Log.d("SourceActivity", "run: responseData:" + responseData.substring(0, 10));
+                    Log.d("SourceActivity", "run: responseData:" + responseData.substring(0, 100));
                     Gson gson = new Gson();
                     entryList = gson.fromJson(responseData, new TypeToken<List<Entry>>(){}.getType());
                     showResponse();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                swipeRefresh.setRefreshing(false);
+//                swipeRefresh.setRefreshing(false);
             }
         }).start();
     }
