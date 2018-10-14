@@ -24,6 +24,7 @@ public class LoginActivity extends AppCompatActivity {
     private EditText ed2;
     private String name;
     private String password;
+    private Config config;
     final OkHttpClient client = new OkHttpClient();
 
 
@@ -31,6 +32,8 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
+
+        config = new Config();
 
         bt1 = (Button) findViewById(R.id.button1);
         bt2 = (Button) findViewById(R.id.button2);
@@ -73,7 +76,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
         //发起请求
         final Request request = new Request.Builder()
-                .url("http://188.131.178.76:3000/users/check")
+                .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/check")
                 .post(formBody)
                 .build();
         //新建一个线程，用于得到服务器响应的参数
@@ -122,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
         //发起请求
         final Request request = new Request.Builder()
-                .url("http://188.131.178.76:3000/users/add")
+                .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/add")
                 .post(formBody)
                 .build();
         //新建一个线程，用于得到服务器响应的参数

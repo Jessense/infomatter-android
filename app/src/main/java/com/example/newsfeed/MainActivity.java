@@ -39,11 +39,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     RecyclerView recyclerView;
     EntryAdapter adapter;
     User user;
+    Config config;
     public SwipeRefreshLayout swipeRefresh;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        config = new Config();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -117,7 +120,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("http://188.131.178.76:3000/users/timeline")
+                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/timeline")
                             .addHeader("user_id", user.getId())
                             .build();
                     Response response = client.newCall(request).execute();

@@ -21,11 +21,14 @@ public class TestActivity extends AppCompatActivity {
     List<Entry> entryList;
     RecyclerView recyclerView;
     EntryAdapter adapter;
+    Config config;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test);
+
+        config = new Config();
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_test);
         recyclerView.setHasFixedSize(true);
@@ -42,7 +45,7 @@ public class TestActivity extends AppCompatActivity {
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("http://188.131.178.76:3000/sources/timeline")
+                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/sources/timeline")
                             .addHeader("source_id", "1")
                             .build();
                     Response response = client.newCall(request).execute();

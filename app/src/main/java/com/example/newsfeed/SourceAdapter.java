@@ -42,6 +42,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
     private Context context;
     private User user;
     private Boolean isSearchingRSS;
+    private Config config;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView sourceName;
@@ -58,6 +59,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         this.context = context;
         this.user = new User(context);
         this.isSearchingRSS = isSearchingRSS;
+        this.config = new Config();
     }
 
 
@@ -136,9 +138,9 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                 String result;
                 if (isSearchingRSS) {
                     HttpUrl request_url = new HttpUrl.Builder()
-                            .scheme("http")
-                            .host("188.131.178.76")
-                            .port(3000)
+                            .scheme(config.getScheme())
+                            .host(config.getHost())
+                            .port(config.getPort())
                             .addPathSegment("sources")
                             .addPathSegment("search")
                             .addQueryParameter("link", source.getLink())
@@ -159,7 +161,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                         source.setId(sourceList.get(0).getId());
                         OkHttpClient client2 = new OkHttpClient();
                         Request request2 = new Request.Builder()
-                                .url("http://188.131.178.76:3000/users/isfollowing")
+                                .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/isfollowing")
                                 .addHeader("user_id", user.getId())
                                 .addHeader("source_id", source.getId())
                                 .build();
@@ -175,7 +177,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                 } else {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("http://188.131.178.76:3000/users/isfollowing")
+                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/isfollowing")
                             .addHeader("user_id", user.getId())
                             .addHeader("source_id", source.getId())
                             .build();
@@ -219,7 +221,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
             try {
                 OkHttpClient client = new OkHttpClient();
                 Request request = new Request.Builder()
-                        .url("http://188.131.178.76:3000/users/" + action)
+                        .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/" + action)
                         .addHeader("user_id", user_id)
                         .addHeader("source_id", source_id)
                         .build();
@@ -264,7 +266,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                         .build();
 
                 Request request = new Request.Builder()
-                        .url("http://188.131.178.76:3000/sources/add")
+                        .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/sources/add")
                         .post(formBody)
                         .build();
                 Response response = client.newCall(request).execute();

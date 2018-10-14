@@ -32,11 +32,14 @@ public class SubscribeActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     SourceAdapter adapter;
     EditText searchEdit;
+    Config config;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_subscribe);
+
+        config = new Config();
 
         searchEdit = (EditText) findViewById(R.id.source_search);
         searchEdit.setOnEditorActionListener(new EditText.OnEditorActionListener() {
@@ -66,7 +69,7 @@ public class SubscribeActivity extends AppCompatActivity {
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("http://188.131.178.76:3000/sources")
+                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/sources")
                             .build();
                     Response response = client.newCall(request).execute();
                     String responseData = response.body().string();
@@ -88,9 +91,9 @@ public class SubscribeActivity extends AppCompatActivity {
                     HttpUrl request_url;
                     if(text.startsWith("http")) {
                         request_url = new HttpUrl.Builder()
-                                .scheme("http")
-                                .host("188.131.178.76")
-                                .port(3000)
+                                .scheme(config.getScheme())
+                                .host(config.getHost())
+                                .port(config.getPort())
                                 .addPathSegment("sources")
                                 .addPathSegment("search")
                                 .addQueryParameter("feedUrl", text)
@@ -98,8 +101,8 @@ public class SubscribeActivity extends AppCompatActivity {
                     } else {
                         request_url = new HttpUrl.Builder()
                                 .scheme("http")
-                                .host("188.131.178.76")
-                                .port(3000)
+                                .host(config.getHost())
+                                .port(config.getPort())
                                 .addPathSegment("sources")
                                 .addPathSegment("search")
                                 .addQueryParameter("name", text)

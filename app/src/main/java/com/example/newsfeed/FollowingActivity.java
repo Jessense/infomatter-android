@@ -22,11 +22,13 @@ public class FollowingActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     SourceAdapter adapter;
     User user;
+    Config config;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_following);
 
+        config = new Config();
         user = new User(getApplicationContext());
 
         recyclerView = (RecyclerView) findViewById(R.id.recycler_following);
@@ -44,7 +46,7 @@ public class FollowingActivity extends AppCompatActivity {
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url("http://188.131.178.76:3000/users/following")
+                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/following")
                             .addHeader("user_id", user.getId())
                             .build();
                     Response response = client.newCall(request).execute();
