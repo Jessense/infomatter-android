@@ -67,12 +67,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         user = new User(getApplicationContext());
         if (!user.getLogined()){
+            Log.d("MainActivity", "onCreate: name: "+user.getName());
             Log.d("MainActivity", "onCreate: logined?"+user.getLogined().toString());
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             Log.d("MainActivity", "onCreate: Prepare to Start Login");
             startActivityForResult(intent, 1);
-//            Log.d("MainActivity", "onCreate: After Login");
-//            Log.d("MainActivity", "onCreate: "+user.getName());
+            Log.d("MainActivity", "onCreate: After Login");
+            Log.d("MainActivity", "onCreate: "+user.getName());
         } else {
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             recyclerView.setHasFixedSize(true);
@@ -100,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     user.setPassword(data.getStringExtra("password"));
                     user.setId(data.getStringExtra("id"));
                     user.setLogined(true);
-                    Log.d("MainActivity", "name: "+user.getName()+",id:"+user.getId());
+                    Log.d("MainActivity", "name: "+user.getName()+",id:"+user.getId() + user.getLogined().toString());
                     recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
                     recyclerView.setHasFixedSize(true);
                     LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -212,6 +213,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         } else if (id == R.id.nav_logout) {
             user.setLogined(false);
+            finish();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

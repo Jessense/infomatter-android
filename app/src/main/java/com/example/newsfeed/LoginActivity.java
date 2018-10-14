@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.json.JSONObject;
 
@@ -98,19 +99,23 @@ public class LoginActivity extends AppCompatActivity {
                             intent.putExtra("password", password);
                             intent.putExtra("id", jsonObject.getString("id"));
                             Log.d("Login Activity", "run: Login success");
-
+                            showToast("Login Successful");
                             intent.putExtra("ed1", name);
                             setResult(RESULT_OK, intent);
                             finish();
+                        } else {
+                            showToast("Login Failed");
                         }
 
                     } else {
                         Log.d("LoginActivity", "run: NOTFOUND");
+                        showToast("Login Failed");
                     }
 
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d("LoginActivity", "run: Exception");
+                    showToast("Login Failed");
                 }
             }
         }).start();
@@ -147,6 +152,7 @@ public class LoginActivity extends AppCompatActivity {
                             intent.putExtra("password", password);
                             intent.putExtra("id", jsonObject.getString("id"));
                             Log.d("Login Activity", "run: Login SUCCESS");
+                            showToast("Register Successful");
                             intent.putExtra("ed1", name);
                             setResult(RESULT_OK, intent);
                             finish();
@@ -154,18 +160,29 @@ public class LoginActivity extends AppCompatActivity {
 
                     } else if(responseData.equals("EXISTED")){
                         Log.d("LoginActivity", "run: username EXISTED");
+                        showToast("Username Existed!");
                     } else {
                         Log.d("LoginActivity", "run: register FAILURE");
+                        showToast("Register Failed");
                     }
 
 
                 } catch (Exception e) {
                     e.printStackTrace();
                     Log.d("LoginActivity", "run: Exception");
+                    showToast("Register Failed");
                 }
             }
         }).start();
 
     }
 
+    private void showToast (final String toastText) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(LoginActivity.this, toastText, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
 }

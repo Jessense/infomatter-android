@@ -15,6 +15,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -89,7 +90,7 @@ public class SubscribeActivity extends AppCompatActivity {
             public void run() {
                 try {
                     HttpUrl request_url;
-                    if(text.startsWith("http")) {
+                    if(text.startsWith(config.getScheme())) {
                         request_url = new HttpUrl.Builder()
                                 .scheme(config.getScheme())
                                 .host(config.getHost())
@@ -100,7 +101,7 @@ public class SubscribeActivity extends AppCompatActivity {
                                 .build();
                     } else {
                         request_url = new HttpUrl.Builder()
-                                .scheme("http")
+                                .scheme(config.getScheme())
                                 .host(config.getHost())
                                 .port(config.getPort())
                                 .addPathSegment("sources")
@@ -115,10 +116,15 @@ public class SubscribeActivity extends AppCompatActivity {
                             .build();
                     Response response = client.newCall(request).execute();
                     String responseData = response.body().string();
-                    Log.d("SubscribeActivity", "run: searchResult"+responseData);
-                    Gson gson = new Gson();
-                    sourceList = gson.fromJson(responseData, new TypeToken<List<Source>>(){}.getType());
-                    showResponse(true);
+                    if (responseData.equals("NOTFOUND")) {
+                        Log.d("SubscribeActivity", "run: no matches");
+                        showToast("No Matches!");
+                    } else {
+                        Log.d("SubscribeActivity", "run: searchResult"+responseData);
+                        Gson gson = new Gson();
+                        sourceList = gson.fromJson(responseData, new TypeToken<List<Source>>(){}.getType());
+                        showResponse(true);
+                    }
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -132,6 +138,15 @@ public class SubscribeActivity extends AppCompatActivity {
             public void run() {
                 adapter = new SourceAdapter(sourceList, isSearching, getApplicationContext());
                 recyclerView.setAdapter(adapter);
+            }
+        });
+    }
+
+    private void showToast (final String toastText) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(SubscribeActivity.this, toastText, Toast.LENGTH_SHORT).show();
             }
         });
     }
