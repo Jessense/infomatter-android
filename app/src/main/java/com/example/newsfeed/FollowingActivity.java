@@ -18,11 +18,11 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class FollowingActivity extends AppCompatActivity {
-    List<Source> sourceList;
-    RecyclerView recyclerView;
-    SourceAdapter adapter;
-    User user;
-    Config config;
+    private List<Source> sourceList;
+    private RecyclerView recyclerView;
+    private SourceAdapter adapter;
+    private User user;
+    private Config config;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

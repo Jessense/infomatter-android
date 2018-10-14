@@ -35,12 +35,12 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
-    List<Entry> entryList;
-    RecyclerView recyclerView;
-    EntryAdapter adapter;
-    User user;
-    Config config;
-    public SwipeRefreshLayout swipeRefresh;
+    private List<Entry> entryList;
+    private RecyclerView recyclerView;
+    private EntryAdapter adapter;
+    private User user;
+    private Config config;
+    private SwipeRefreshLayout swipeRefresh;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

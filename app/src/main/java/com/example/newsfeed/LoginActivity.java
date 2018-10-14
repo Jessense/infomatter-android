@@ -25,7 +25,7 @@ public class LoginActivity extends AppCompatActivity {
     private String name;
     private String password;
     private Config config;
-    final OkHttpClient client = new OkHttpClient();
+    final private OkHttpClient client = new OkHttpClient();
 
 
     @Override

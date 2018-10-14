@@ -28,11 +28,11 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class SubscribeActivity extends AppCompatActivity {
-    List<Source> sourceList;
-    RecyclerView recyclerView;
-    SourceAdapter adapter;
-    EditText searchEdit;
-    Config config;
+    private List<Source> sourceList;
+    private RecyclerView recyclerView;
+    private SourceAdapter adapter;
+    private EditText searchEdit;
+    private Config config;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

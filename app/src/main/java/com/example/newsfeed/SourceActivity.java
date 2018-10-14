@@ -20,13 +20,13 @@ import okhttp3.Request;
 import okhttp3.Response;
 
 public class SourceActivity extends AppCompatActivity {
-    List<Entry> entryList;
-    RecyclerView recyclerView;
-    EntryAdapter adapter;
-    String source_id;
-    String source_name;
-    TextView sourceTitle;
-    Config config;
+    private List<Entry> entryList;
+    private RecyclerView recyclerView;
+    private EntryAdapter adapter;
+    private String source_id;
+    private String source_name;
+    private TextView sourceTitle;
+    private Config config;
 //    public SwipeRefreshLayout swipeRefresh;
 
     @Override

@@ -45,11 +45,11 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
     private Context context;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        public TextView entryTitle;
-        public TextView entrySourceTime;
-        public ImageView entryPhoto;
-        public CardView entryCard;
-        public ViewHolder(View view) {
+        private TextView entryTitle;
+        private TextView entrySourceTime;
+        private ImageView entryPhoto;
+        private CardView entryCard;
+        private ViewHolder(View view) {
             super(view);
             entryTitle = (TextView) view.findViewById(R.id.entry_name);
             entrySourceTime = (TextView) view.findViewById(R.id.entry_source_time);

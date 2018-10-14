@@ -18,10 +18,10 @@ import okhttp3.Response;
 
 public class TestActivity extends AppCompatActivity {
 
-    List<Entry> entryList;
-    RecyclerView recyclerView;
-    EntryAdapter adapter;
-    Config config;
+    private List<Entry> entryList;
+    private RecyclerView recyclerView;
+    private EntryAdapter adapter;
+    private Config config;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
