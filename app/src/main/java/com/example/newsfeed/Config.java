@@ -3,7 +3,7 @@ package com.example.newsfeed;
 
 public class Config {
     private String scheme = "http";
-    private String host = "188.131.178.76";
+    private String host = "";
     private Integer port = 3000;
 
 
