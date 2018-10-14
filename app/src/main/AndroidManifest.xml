@@ -23,7 +23,9 @@
         <activity android:name=".WebviewActivity" />
         <activity android:name=".LoginActivity" />
         <activity android:name=".SubscribeActivity" />
-        <activity android:name=".SourceActivity"></activity>
+        <activity android:name=".SourceActivity" />
+        <activity android:name=".FollowingActivity" />
+        <activity android:name=".TestActivity"></activity>
     </application>
 
 </manifest>

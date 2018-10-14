@@ -196,8 +196,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         if (id == R.id.nav_favourites) {
             // Handle the camera action
         } else if (id == R.id.nav_following) {
+            Intent inent = new Intent(MainActivity.this, FollowingActivity.class);
+            startActivity(inent);
 
         } else if (id == R.id.nav_discovery) {
+            Intent intent = new Intent(MainActivity.this, TestActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_feedback) {
 

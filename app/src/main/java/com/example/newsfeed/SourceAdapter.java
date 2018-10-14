@@ -90,6 +90,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
             public void onClick(View v) {
                 Intent intent = new Intent(context, SourceActivity.class);
                 intent.putExtra("source_id", source.getId());
+                intent.putExtra("source_name", source.getName());
                 context.startActivity(intent);
             }
         });
