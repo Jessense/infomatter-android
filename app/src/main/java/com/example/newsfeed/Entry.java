@@ -50,10 +50,10 @@ public class Entry {
     public String geLocalPubTime() {
         Date now = new Date();
         LocalDateTime localDate = now.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-        String cur_year  = String.format("%04d", localDate.plusHours(8).getYear());
-        String cur_month = String.format("%02d", localDate.plusHours(8).getMonthValue());
-        String cur_day   = String.format("%02d", localDate.plusHours(8).getDayOfMonth());
-        String cur_hour = String.format("%02d", localDate.plusHours(8).getHour());
+        String cur_year  = String.format("%04d", localDate.getYear());
+        String cur_month = String.format("%02d", localDate.getMonthValue());
+        String cur_day   = String.format("%02d", localDate.getDayOfMonth());
+        String cur_hour = String.format("%02d", localDate.getHour());
 
 
         DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
