@@ -78,7 +78,7 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
 
         holder.entryTitle.setText(entry.getTitle());
         holder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
-        if (entry.getPhoto() != null && entry.getPhoto() != "" ) {
+        if (entry.getPhoto() != null && entry.getPhoto() != "" && !entry.getSourceId().equals("19")) {
             Picasso.get()
                     .load(entry.getPhoto())
                     .into(holder.entryPhoto);

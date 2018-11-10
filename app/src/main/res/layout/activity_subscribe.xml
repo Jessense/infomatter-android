@@ -15,11 +15,15 @@
         android:singleLine="true"
         android:imeOptions="actionDone"
         android:hint="input source name or rss link"
+        android:textCursorDrawable="@drawable/cursor_color"
+        android:theme="@style/MyEditText"
+        android:layout_marginTop="20dp"
+        android:layout_marginHorizontal="20dp"
         />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/source_list"
-        android:paddingTop="140px"
+        android:paddingTop="180px"
         android:scrollbars="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>

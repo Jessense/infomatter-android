@@ -45,12 +45,14 @@
                 android:id="@+id/entry_source_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/entry_name"/>
+                android:layout_below="@+id/entry_name"
+                android:paddingTop="2dp"
+                android:textSize="13dp"/>
 
             <ImageView
                 android:id="@+id/entry_cover"
                 android:layout_width="100dp"
-                android:layout_height="100dp"
+                android:layout_height="80dp"
                 android:layout_marginLeft="10dp"
                 android:layout_alignParentRight="true"
                 android:layout_alignParentTop="true"

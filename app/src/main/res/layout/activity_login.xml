@@ -7,30 +7,58 @@
     android:orientation="vertical"
     tools:context=".LoginActivity">
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Welcome to infomatter"
+        android:textColor="@color/simplenoteBlue"
+        android:textSize="20dp"
+        android:layout_marginHorizontal="20dp"/>
+
     <EditText
         android:id = "@+id/editText1"
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
+        android:theme="@style/MyEditText"
+        android:textCursorDrawable="@drawable/cursor_color"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:hint="username"
         />
 
     <EditText
         android:id = "@+id/editText2"
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
-        android:inputType = "textPassword" />
+        android:inputType = "textPassword"
+        android:theme="@style/MyEditText"
+        android:textCursorDrawable="@drawable/cursor_color"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:hint="password"
+        />
 
     <Button
         android:id = "@+id/button1"
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
         android:text = "Login"
+        android:textColor="@color/white"
+        android:background="@drawable/btn_bg_blue"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
         />
 
     <Button
         android:id = "@+id/button2"
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
+        android:background="@drawable/border_line_blue"
         android:text = "Register"
+        android:textColor="@color/simplenoteBlue"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
         />
 
 </LinearLayout>

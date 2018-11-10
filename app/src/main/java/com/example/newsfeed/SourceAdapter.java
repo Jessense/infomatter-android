@@ -3,6 +3,7 @@ package com.example.newsfeed;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Message;
@@ -108,11 +109,11 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                     action = "unfollow";
                     FollowTask followTask = new FollowTask(holder.followButton);
                     followTask.executeOnExecutor(Executors.newCachedThreadPool(), user.getId(), source.getId(), action);
-                } else if(curState.equals("follow")){
+                } else if(curState.equals("+ follow")){
                     action = "follow";
                     FollowTask followTask = new FollowTask(holder.followButton);
                     followTask.executeOnExecutor(Executors.newCachedThreadPool(), user.getId(), source.getId(), action);
-                } else if(curState.equals("add")){
+                } else if(curState.equals("+ add")){
                     AddTask addTask = new AddTask(holder.followButton);
                     addTask.executeOnExecutor(Executors.newCachedThreadPool(), source);
                 }
@@ -153,7 +154,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                     String responseData = response.body().string();
                     Log.d("SubscribeActivity", "doInBackground: responseRSS:"+responseData);
                     if (responseData.equals("NOTFOUND")) {
-                        result = "add";
+                        result = "+ add";
                         Log.d("SubscribeActivity", "doInBackground: relationResult="+result);
                     } else {
                         Gson gson = new Gson();
@@ -171,7 +172,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                         if (isFollowing) {
                             result = "following";
                         } else {
-                            result = "follow";
+                            result = "+ follow";
                         }
                     }
                 } else {
@@ -187,7 +188,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                     if (isFollowing) {
                         result = "following";
                     } else {
-                        result = "follow";
+                        result = "+ follow";
                     }
                 }
                 return result;
@@ -200,7 +201,20 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         @Override
         protected void onPostExecute(String text) {
             super.onPostExecute(text);
-            followbtn.setText(text);
+            if (text.equals("following")) {
+                followbtn.setText("following");
+                followbtn.setTextColor(context.getResources().getColor(R.color.simplenoteBlue));
+                followbtn.setBackgroundResource(R.drawable.border_line_blue);
+
+            } else if(text.equals("+ follow")){
+                followbtn.setText("+ follow");
+                followbtn.setTextColor(context.getResources().getColor(R.color.white));
+                followbtn.setBackgroundResource(R.drawable.btn_bg_blue);
+            } else if(text.equals(("+ add"))){
+                followbtn.setText("+ add");
+                followbtn.setTextColor(context.getResources().getColor(R.color.white));
+                followbtn.setBackgroundResource(R.drawable.btn_bg_blue);
+            }
         }
     }
 
@@ -240,8 +254,13 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
             if (result.equals("SUCCESS")) {
                 if (action.equals("follow")) {
                     followbtn.setText("following");
+                    followbtn.setTextColor(context.getResources().getColor(R.color.simplenoteBlue));
+                    followbtn.setBackgroundResource(R.drawable.border_line_blue);
+
                 } else {
-                    followbtn.setText("follow");
+                    followbtn.setText("+ follow");
+                    followbtn.setTextColor(context.getResources().getColor(R.color.white));
+                    followbtn.setBackgroundResource(R.drawable.btn_bg_blue);
                 }
             }
         }
@@ -263,6 +282,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                         .add("name", source.getName())
                         .add("link",source.getLink())
                         .add("feedUrl", source.getFeedUrl())
+                        .add("photo", source.getPhoto())
                         .build();
 
                 Request request = new Request.Builder()
@@ -286,7 +306,9 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         protected void onPostExecute(Integer result) {
             super.onPostExecute(result);
             source.setId(result.toString());
-            followbtn.setText("follow");
+            followbtn.setText("+ follow");
+            followbtn.setTextColor(context.getResources().getColor(R.color.white));
+            followbtn.setBackgroundResource(R.drawable.btn_bg_blue);
         }
     }
 
