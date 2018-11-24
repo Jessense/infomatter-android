@@ -40,16 +40,26 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
-public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> {
+public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    private final int ENTRY_WHITOUT_COVER = 1;
+    private final int ENTRY_WITH_COVER = 2;
+    private final int ENTRY_WEIBO = 3;
+
     private List<Entry> mEntryList;
     private Context context;
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    public EntryAdapter (List<Entry> entryList, Context context) {
+        this.mEntryList = entryList;
+        this.context = context;
+    }
+
+
+    public static class EntryViewHolder extends RecyclerView.ViewHolder {
         private TextView entryTitle;
         private TextView entrySourceTime;
         private ImageView entryPhoto;
         private CardView entryCard;
-        private ViewHolder(View view) {
+        private EntryViewHolder(View view) {
             super(view);
             entryTitle = (TextView) view.findViewById(R.id.entry_name);
             entrySourceTime = (TextView) view.findViewById(R.id.entry_source_time);
@@ -58,66 +68,180 @@ public class EntryAdapter extends RecyclerView.Adapter<EntryAdapter.ViewHolder> 
         }
     }
 
-    public EntryAdapter (List<Entry> entryList, Context context) {
-        this.mEntryList = entryList;
-        this.context = context;
+    public static class EntryViewHolderWithoutCover extends RecyclerView.ViewHolder {
+        private TextView entryTitle;
+        private TextView entrySourceTime;
+        private CardView entryCard;
+        private EntryViewHolderWithoutCover(View view) {
+            super(view);
+            entryTitle = (TextView) view.findViewById(R.id.entry_name_without_cover);
+            entrySourceTime = (TextView) view.findViewById(R.id.entry_source_time_without_cover);
+            entryCard = (CardView) view.findViewById(R.id.entry_card_without_cover);
+        }
+    }
+
+    public static class EntryViewHolderWeibo extends RecyclerView.ViewHolder {
+        private TextView entryTitle;
+        private TextView entrySourceTime;
+        private CardView entryCard;
+        private EntryViewHolderWeibo(View view) {
+            super(view);
+            entryTitle = (TextView) view.findViewById(R.id.entry_name_weibo);
+            entrySourceTime = (TextView) view.findViewById(R.id.entry_source_time_weibo);
+            entryCard = (CardView) view.findViewById(R.id.entry_card_weibo);
+        }
+    }
+
+
+
+    @Override
+    public int getItemViewType(int position) {
+        if (mEntryList.get(position).getLink().startsWith("https://www.weibo.com")) {
+            return ENTRY_WEIBO;
+        } else if (mEntryList.get(position).getPhoto() == null || mEntryList.get(position).getPhoto().equals("") || mEntryList.get(position).getSourceId().equals("19")) { //无封面图的文章
+            return ENTRY_WHITOUT_COVER;
+        } else {
+            return ENTRY_WITH_COVER; //有封面图的文章
+        }
     }
 
     @Override
-    public ViewHolder onCreateViewHolder(ViewGroup parent, int i) {
-        View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.entry, parent, false);
-        ViewHolder holder = new ViewHolder(view);
-        return holder;
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+//        View view = LayoutInflater.from(parent.getContext())
+//                .inflate(R.layout.entry, parent, false);
+//        SourceAdapter.ViewHolder holder = new SourceAdapter.ViewHolder(view);
+        View view;
+        if (viewType == ENTRY_WEIBO) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.entry_weibo, parent, false);
+            return new EntryViewHolderWeibo(view); //TODO
+        } else if (viewType == ENTRY_WHITOUT_COVER) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.entry_without_cover, parent, false);
+            return new EntryViewHolderWithoutCover(view);
+        } else {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.entry, parent, false);
+            return new EntryViewHolder(view);
+        }
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
-    public void onBindViewHolder(ViewHolder holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         final Entry entry = mEntryList.get(position);
 
-        holder.entryTitle.setText(entry.getTitle());
-        holder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
-        if (entry.getPhoto() != null && entry.getPhoto() != "" && !entry.getSourceId().equals("19")) {
+        if (holder instanceof EntryViewHolder) {
+            EntryViewHolder viewHolder = (EntryViewHolder) holder;
+            viewHolder.entryTitle.setText(entry.getTitle());
+            viewHolder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
             Picasso.get()
                     .load(entry.getPhoto())
-                    .into(holder.entryPhoto);
-        } else {
-            holder.entryPhoto.setVisibility(View.INVISIBLE);
+                    .into(viewHolder.entryPhoto);
+
+            ((EntryViewHolder) holder).entryCard.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String url = entry.getLink();
+                    PackageManager pm = context.getPackageManager();
+                    boolean isChromeInstalled = isPackageInstalled("com.android.chrome", pm);
+                    if (isChromeInstalled) {
+                        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_share);
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.putExtra(Intent.EXTRA_TEXT, entry.getLink());
+                        intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
+                        int requestCode = 100;
+
+                        PendingIntent pendingIntent = PendingIntent.getActivity(view.getContext(),
+                                requestCode,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT);
+
+                        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                        builder.setActionButton(bitmap, "Share Link", pendingIntent, true);
+                        CustomTabsIntent customTabsIntent = builder.build();
+                        customTabsIntent.launchUrl(view.getContext(), Uri.parse(url));
+                    } else {
+                        Intent intent = new Intent(view.getContext(), WebviewActivity.class);
+                        intent.putExtra("extra_data",url);
+                        view.getContext().startActivity(intent);
+                    }
+                }
+            });
+
+        } else if (holder instanceof EntryViewHolderWithoutCover) {
+            EntryViewHolderWithoutCover viewHolder = (EntryViewHolderWithoutCover) holder;
+            viewHolder.entryTitle.setText(entry.getTitle());
+            viewHolder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
+
+            ((EntryViewHolderWithoutCover) holder).entryCard.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String url = entry.getLink();
+                    PackageManager pm = context.getPackageManager();
+                    boolean isChromeInstalled = isPackageInstalled("com.android.chrome", pm);
+                    if (isChromeInstalled) {
+                        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_share);
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.putExtra(Intent.EXTRA_TEXT, entry.getLink());
+                        intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
+                        int requestCode = 100;
+
+                        PendingIntent pendingIntent = PendingIntent.getActivity(view.getContext(),
+                                requestCode,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT);
+
+                        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                        builder.setActionButton(bitmap, "Share Link", pendingIntent, true);
+                        CustomTabsIntent customTabsIntent = builder.build();
+                        customTabsIntent.launchUrl(view.getContext(), Uri.parse(url));
+                    } else {
+                        Intent intent = new Intent(view.getContext(), WebviewActivity.class);
+                        intent.putExtra("extra_data",url);
+                        view.getContext().startActivity(intent);
+                    }
+                }
+            });
+        } else if (holder instanceof EntryViewHolderWeibo){
+            EntryViewHolderWeibo viewHolder = (EntryViewHolderWeibo) holder;
+            viewHolder.entryTitle.setText(entry.getTitle());
+            viewHolder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
+
+            ((EntryViewHolderWeibo) holder).entryCard.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    String url = entry.getLink();
+                    PackageManager pm = context.getPackageManager();
+                    boolean isChromeInstalled = isPackageInstalled("com.android.chrome", pm);
+                    if (isChromeInstalled) {
+                        Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_share);
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.setType("text/plain");
+                        intent.putExtra(Intent.EXTRA_TEXT, entry.getLink());
+                        intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
+                        int requestCode = 100;
+
+                        PendingIntent pendingIntent = PendingIntent.getActivity(view.getContext(),
+                                requestCode,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT);
+
+                        CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
+                        builder.setActionButton(bitmap, "Share Link", pendingIntent, true);
+                        CustomTabsIntent customTabsIntent = builder.build();
+                        customTabsIntent.launchUrl(view.getContext(), Uri.parse(url));
+                    } else {
+                        Intent intent = new Intent(view.getContext(), WebviewActivity.class);
+                        intent.putExtra("extra_data",url);
+                        view.getContext().startActivity(intent);
+                    }
+                }
+            });
         }
 
-//        if (entry.getPhoto() != null)
-//            holder.entryPhoto.setImageURI(Uri.parse(entry.getPhoto()));
-        holder.entryCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = entry.getLink();
-                PackageManager pm = context.getPackageManager();
-                boolean isChromeInstalled = isPackageInstalled("com.android.chrome", pm);
-                if (isChromeInstalled) {
-                    Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_share);
-                    Intent intent = new Intent(Intent.ACTION_SEND);
-                    intent.setType("text/plain");
-                    intent.putExtra(Intent.EXTRA_TEXT, entry.getLink());
-                    intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
-                    int requestCode = 100;
-
-                    PendingIntent pendingIntent = PendingIntent.getActivity(view.getContext(),
-                            requestCode,
-                            intent,
-                            PendingIntent.FLAG_UPDATE_CURRENT);
-
-                    CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                    builder.setActionButton(bitmap, "Share Link", pendingIntent, true);
-                    CustomTabsIntent customTabsIntent = builder.build();
-                    customTabsIntent.launchUrl(view.getContext(), Uri.parse(url));
-                } else {
-                    Intent intent = new Intent(view.getContext(), WebviewActivity.class);
-                    intent.putExtra("extra_data",url);
-                    view.getContext().startActivity(intent);
-                }
-            }
-        });
 
     }
 
