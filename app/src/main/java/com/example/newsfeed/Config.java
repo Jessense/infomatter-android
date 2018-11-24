@@ -3,8 +3,9 @@ package com.example.newsfeed;
 
 public class Config {
     private String scheme = "http";
-    private String host = "188.131.178.76";
+    private String host = "";
     private Integer port = 3000;
+    private Integer pub_rsshub_port = 1200;
 
 
     public String getScheme() {
@@ -19,6 +20,10 @@ public class Config {
         return port;
     }
 
+    public Integer getPub_rsshub_port() {
+        return pub_rsshub_port;
+    }
+
     public void setScheme(String scheme) {
         this.scheme = scheme;
     }
@@ -29,5 +34,9 @@ public class Config {
 
     public void setPort(Integer port) {
         this.port = port;
+    }
+
+    public void setPub_rsshub_port(Integer pub_rsshub_port) {
+        this.pub_rsshub_port = pub_rsshub_port;
     }
 }

@@ -98,7 +98,9 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public int getItemViewType(int position) {
         if (mEntryList.get(position).getLink().startsWith("https://www.weibo.com")) {
             return ENTRY_WEIBO;
-        } else if (mEntryList.get(position).getPhoto() == null || mEntryList.get(position).getPhoto().equals("") || mEntryList.get(position).getSourceId().equals("19")) { //无封面图的文章
+        } else if (mEntryList.get(position).getPhoto() == null || mEntryList.get(position).getPhoto().equals("")
+                || mEntryList.get(position).getSourceId().equals("19") || mEntryList.get(position).getSourceId().equals("15")) { //无封面图的文章
+            /*TODO: 消除硬编码，不要直接用source_id做判断条件，否则删除这个source后或者重新添加时肯会出问题*/
             return ENTRY_WHITOUT_COVER;
         } else {
             return ENTRY_WITH_COVER; //有封面图的文章

@@ -99,6 +99,16 @@ public class SubscribeActivity extends AppCompatActivity {
                                 .addPathSegment("search")
                                 .addQueryParameter("feedUrl", text)
                                 .build();
+                    } else if (text.startsWith("///")) {
+                        request_url = new HttpUrl.Builder()
+                                .scheme(config.getScheme())
+                                .host(config.getHost())
+                                .port(config.getPort())
+                                .addPathSegment("sources")
+                                .addPathSegment("search")
+                                .addQueryParameter("feedUrl", config.getScheme() + "://" + config.getHost() + ":" + config.getPub_rsshub_port() + "/" + text.substring(3))
+                                .build();
+                        Log.d("SubscribeActivity", "run: search text"+config.getScheme() + "://" + config.getHost() + ":" + config.getPub_rsshub_port() + "/" + text.substring(3));
                     } else {
                         request_url = new HttpUrl.Builder()
                                 .scheme(config.getScheme())
