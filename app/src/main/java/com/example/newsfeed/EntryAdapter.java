@@ -16,6 +16,8 @@ import android.support.customtabs.CustomTabsIntent;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -25,14 +27,20 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
+import com.lzy.ninegrid.ImageInfo;
+import com.lzy.ninegrid.NineGridView;
+import com.lzy.ninegrid.preview.NineGridViewClickAdapter;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -81,14 +89,16 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public static class EntryViewHolderWeibo extends RecyclerView.ViewHolder {
-        private TextView entryTitle;
+        private TextView entryContent;
         private TextView entrySourceTime;
         private CardView entryCard;
+        private NineGridView nineGridView;
         private EntryViewHolderWeibo(View view) {
             super(view);
-            entryTitle = (TextView) view.findViewById(R.id.entry_name_weibo);
+            entryContent = (TextView) view.findViewById(R.id.entry_content_weibo);
             entrySourceTime = (TextView) view.findViewById(R.id.entry_source_time_weibo);
             entryCard = (CardView) view.findViewById(R.id.entry_card_weibo);
+            nineGridView = (NineGridView) view.findViewById(R.id.nineGrid);
         }
     }
 
@@ -96,7 +106,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemViewType(int position) {
-        if (mEntryList.get(position).getLink().startsWith("https://www.weibo.com")) {
+        if (mEntryList.get(position).getLink().indexOf("weibo.com") != -1 || mEntryList.get(position).getLink().indexOf("weibo.cn") != -1) {
             return ENTRY_WEIBO;
         } else if (mEntryList.get(position).getPhoto() == null || mEntryList.get(position).getPhoto().equals("")
                 || mEntryList.get(position).getSourceId().equals("19") || mEntryList.get(position).getSourceId().equals("15")) { //无封面图的文章
@@ -209,8 +219,23 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             });
         } else if (holder instanceof EntryViewHolderWeibo){
             EntryViewHolderWeibo viewHolder = (EntryViewHolderWeibo) holder;
-            viewHolder.entryTitle.setText(entry.getTitle());
+            viewHolder.entryContent.setText(Html.fromHtml(entry.getContent().replaceAll("<img.+?>", "")));
+//            viewHolder.entryContent.setText(Html.fromHtml(entry.getContent()));
             viewHolder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
+
+            ArrayList<ImageInfo> imageInfo = new ArrayList<>();
+            List<String> imageDetails = getAttachments(entry.getContent());
+            if (imageDetails != null) {
+                for (String imageDetail : imageDetails) {
+                    ImageInfo info = new ImageInfo();
+                    info.setThumbnailUrl(imageDetail);
+                    info.setBigImageUrl(imageDetail);
+                    imageInfo.add(info);
+                    Log.d("EntryAdapter", "onBindViewHolder: imageDetail:" + imageDetail);
+                }
+            }
+
+            viewHolder.nineGridView.setAdapter(new NineGridViewClickAdapter(context, imageInfo));
 
             ((EntryViewHolderWeibo) holder).entryCard.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -245,6 +270,33 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
 
 
+    }
+
+    public static List<String> getAttachments(String content){
+        List<String> list = new ArrayList<String>();
+//目前img标签标示有3种表达式
+//<img alt="" src="1.jpg"/> <img alt="" src="1.jpg"></img> <img alt="" src="1.jpg">
+//开始匹配content中的<img />标签
+        Pattern p_img = Pattern.compile("<(img|IMG)(.*?)(/>|></img>|>)");
+        Matcher m_img = p_img.matcher(content);
+        boolean result_img = m_img.find();
+        if (result_img) {
+            while (result_img) {
+//获取到匹配的<img />标签中的内容
+                String str_img = m_img.group(2);
+//开始匹配<img />标签中的src
+                Pattern p_src = Pattern.compile("(src|SRC)=(\"|\')(.*?)(\"|\')");
+                Matcher m_src = p_src.matcher(str_img);
+                if (m_src.find()) {
+                    String str_src = m_src.group(3);
+                    if (str_src.endsWith(".jpg"))
+                        list.add(str_src);
+                }
+//匹配content中是否存在下一个<img />标签，有则继续以上步骤匹配<img />标签中的src
+                result_img = m_img.find();
+            }
+        }
+        return list;
     }
 
     private boolean isPackageInstalled(String packageName, PackageManager packageManager) {

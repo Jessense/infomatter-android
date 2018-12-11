@@ -18,6 +18,7 @@ public class Entry {
     private String source_id;
     private String source_name;
     private String photo;
+    private String content;
 
     public Entry(String title, String link, String time) {
         this.title = title;
@@ -37,6 +38,10 @@ public class Entry {
     }
     public String getPhoto() {
         return photo;
+    }
+
+    public String getContent() {
+        return content;
     }
 
     public String getSourceName() {
@@ -108,5 +113,9 @@ public class Entry {
 
     public void setSourceName(String source_name) {
         this.source_name = source_name;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
     }
 }

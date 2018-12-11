@@ -14,12 +14,15 @@
         android:clickable="true"
         android:focusable="true"
         android:foreground="?android:attr/selectableItemBackground"
-        android:elevation="8dp"
         android:divider="@android:color/transparent"
         android:dividerHeight="0.0px"
+
         android:clipToPadding="false"
         android:clipChildren="false"
-        card_view:cardElevation="10dp"
+        card_view:cardElevation="2dp"
+
+        card_view:cardUseCompatPadding="true"
+        card_view:cardBackgroundColor="@android:color/white"
         card_view:cardPreventCornerOverlap="false">
 
         <RelativeLayout
@@ -36,6 +39,8 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="16dp"
+                android:letterSpacing="0.05"
+                android:lineSpacingExtra="2dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
 
@@ -46,8 +51,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/entry_name"
-                android:paddingTop="2dp"
-                android:textSize="13dp"/>
+                android:paddingTop="5dp"
+                android:textSize="12dp"/>
 
             <ImageView
                 android:id="@+id/entry_cover"
