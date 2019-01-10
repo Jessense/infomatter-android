@@ -69,6 +69,7 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+    //用户登录请求
     private void postLoginRequest(final String name,final String password)  {
         //建立请求表单，添加上传服务器的参数
         RequestBody formBody = new FormBody.Builder()
@@ -122,6 +123,8 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
+
+    //用户注册请求
     private void postRegisterRequest(final String name,final String password)  {
         //建立请求表单，添加上传服务器的参数
         RequestBody formBody = new FormBody.Builder()

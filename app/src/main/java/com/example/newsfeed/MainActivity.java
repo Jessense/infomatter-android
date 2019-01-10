@@ -70,7 +70,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
         user = new User(getApplicationContext());
-        if (!user.getLogined()){
+        if (!user.getLogined()){ //如果用户未登录，则进行登录
             Log.d("MainActivity", "onCreate: name: "+user.getName());
             Log.d("MainActivity", "onCreate: logined?"+user.getLogined().toString());
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
@@ -78,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivityForResult(intent, 1);
             Log.d("MainActivity", "onCreate: After Login");
             Log.d("MainActivity", "onCreate: "+user.getName());
-        } else {
+        } else { //如果用户已登录，则进入主页显示时间线
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             recyclerView.setHasFixedSize(true);
             LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -95,6 +95,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     }
 
+    //登录结果返回后完善当前用户的信息，如用户id
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -118,6 +119,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
+    //获取Entry列表
     private void getEntryList() {
         new Thread(new Runnable() {
             @Override
@@ -142,6 +144,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
 
+    //显示Entry列表
     private void showResponse () {
         runOnUiThread(new Runnable() {
             @Override
@@ -162,18 +165,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    /**
-     *创建菜单
-     */
+    //创建菜单
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main,menu); //通过getMenuInflater()方法得到MenuInflater对象，再调用它的inflate()方法就可以给当前活动创建菜单了，第一个参数：用于指定我们通过哪一个资源文件来创建菜单；第二个参数：用于指定我们的菜单项将添加到哪一个Menu对象当中。
         return true; // true：允许创建的菜单显示出来，false：创建的菜单将无法显示。
     }
 
-    /**
-     *菜单的点击事件
-     */
+    //菜单的点击事件
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
@@ -225,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         return true;
     }
 
-    /** Picasso 加载 */
+    //Picasso 加载图片
     private class PicassoImageLoader implements NineGridView.ImageLoader {
 
         @Override

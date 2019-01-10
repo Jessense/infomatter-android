@@ -99,7 +99,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         });
 
 
-
+        //用户点添加、关注、取关按钮，分别异步执行三种任务
         holder.followButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -120,11 +120,10 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
             }
         });
 
-
     }
 
 
-
+    //请求用户的订阅列表
     class GetRelationTask extends AsyncTask<Source, Void, String> {
         private Button followbtn;
         Source source;
@@ -218,6 +217,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         }
     }
 
+    //用户请求关注某一内容源
     class FollowTask extends AsyncTask<String, Void, String> {
         private Button followbtn;
         String user_id;
@@ -266,6 +266,8 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         }
     }
 
+
+    //用户请求添加某一内容源
     class AddTask extends AsyncTask<Source, Void, Integer> {
         private Button followbtn;
         Source source;

@@ -62,7 +62,7 @@ public class SubscribeActivity extends AppCompatActivity {
     }
 
 
-
+    //获取内容源列表
     private void getSourceList() {
         new Thread(new Runnable() {
             @Override
@@ -84,6 +84,7 @@ public class SubscribeActivity extends AppCompatActivity {
         }).start();
     }
 
+    //获取搜索结果列表
     private void getSearchResult(final String text) {
         new Thread(new Runnable() {
             @Override

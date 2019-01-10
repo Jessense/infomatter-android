@@ -9,9 +9,9 @@ public class User {
     private Context mycontext;
     private String name;
     private String password;
-    private String photo;
+    private String photo; //头像
     private String id;
-    private Boolean logined;
+    private Boolean logined; //是否已登录
 
     public User(Context context) {
         this.mycontext = context;

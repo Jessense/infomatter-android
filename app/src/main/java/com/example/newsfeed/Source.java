@@ -3,9 +3,9 @@ package com.example.newsfeed;
 public class Source {
     private String id;
     private String name;
-    private String feedUrl;
+    private String feedUrl; //内容源的RSS链接
     private String link;
-    private String photo;
+    private String photo; //内容源图标
     public Source(String name, String feedUrl, String link, String photo) {
         this.name = name;
         this.feedUrl = feedUrl;

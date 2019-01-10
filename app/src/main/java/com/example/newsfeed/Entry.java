@@ -17,12 +17,13 @@ public class Entry {
     private String time;
     private String source_id;
     private String source_name;
-    private String photo;
+    private String photo; //封面图片链接
     private String content;
 
     public Entry(String title, String link, String time) {
         this.title = title;
         this.link = link;
+        this.time = time;
     }
     public String getTitle() {
         return title;
@@ -62,6 +63,7 @@ public class Entry {
 
 
         DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+        System.out.print("time:"+time);
         TemporalAccessor accessor = timeFormatter.parse(time);
         Date pubDate = Date.from(Instant.from(accessor));
         LocalDateTime localPubDate = pubDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
@@ -81,6 +83,8 @@ public class Entry {
             pub_day   = String.format("%02d", localPubDate.plusHours(8).getDayOfMonth());
             pub_hour = String.format("%02d", localPubDate.plusHours(8).getHour());
         }
+
+
 
 
 

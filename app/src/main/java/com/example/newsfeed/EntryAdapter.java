@@ -62,6 +62,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
 
+    //带封面图的文章类Entry
     public static class EntryViewHolder extends RecyclerView.ViewHolder {
         private TextView entryTitle;
         private TextView entrySourceTime;
@@ -76,6 +77,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    //不带封面图的文章类Entry
     public static class EntryViewHolderWithoutCover extends RecyclerView.ViewHolder {
         private TextView entryTitle;
         private TextView entrySourceTime;
@@ -88,6 +90,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    //微博类Entry，可以显示微博正文和九图
     public static class EntryViewHolderWeibo extends RecyclerView.ViewHolder {
         private TextView entryContent;
         private TextView entrySourceTime;
@@ -138,6 +141,8 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+
+    //根据Entry的类型进行不同的数据-视图绑定
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
@@ -272,19 +277,20 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     }
 
+    //从微博网页源码提取微博正文的图片列表
     public static List<String> getAttachments(String content){
         List<String> list = new ArrayList<String>();
-//目前img标签标示有3种表达式
-//<img alt="" src="1.jpg"/> <img alt="" src="1.jpg"></img> <img alt="" src="1.jpg">
-//开始匹配content中的<img />标签
+        //目前img标签标示有3种表达式
+        //<img alt="" src="1.jpg"/> <img alt="" src="1.jpg"></img> <img alt="" src="1.jpg">
+        //开始匹配content中的<img />标签
         Pattern p_img = Pattern.compile("<(img|IMG)(.*?)(/>|></img>|>)");
         Matcher m_img = p_img.matcher(content);
         boolean result_img = m_img.find();
         if (result_img) {
             while (result_img) {
-//获取到匹配的<img />标签中的内容
+                //获取到匹配的<img />标签中的内容
                 String str_img = m_img.group(2);
-//开始匹配<img />标签中的src
+                //开始匹配<img />标签中的src
                 Pattern p_src = Pattern.compile("(src|SRC)=(\"|\')(.*?)(\"|\')");
                 Matcher m_src = p_src.matcher(str_img);
                 if (m_src.find()) {
@@ -292,13 +298,14 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     if (str_src.endsWith(".jpg"))
                         list.add(str_src);
                 }
-//匹配content中是否存在下一个<img />标签，有则继续以上步骤匹配<img />标签中的src
+                //匹配content中是否存在下一个<img />标签，有则继续以上步骤匹配<img />标签中的src
                 result_img = m_img.find();
             }
         }
         return list;
     }
 
+    //判断用户是否安装了某个程序，用于判断用户是否安装了chrome浏览器
     private boolean isPackageInstalled(String packageName, PackageManager packageManager) {
         try {
             packageManager.getPackageInfo(packageName, 0);

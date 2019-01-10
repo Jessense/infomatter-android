@@ -59,6 +59,8 @@ public class SourceActivity extends AppCompatActivity {
 //        });
     }
 
+
+    //请求某一内容源的全部更新列表
     private void getEntryList(final String source_id) {
         new Thread(new Runnable() {
             @Override

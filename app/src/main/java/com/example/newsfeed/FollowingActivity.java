@@ -39,6 +39,7 @@ public class FollowingActivity extends AppCompatActivity {
         getFollowingList();
     }
 
+    //请求用户关注列表
     private void getFollowingList() {
         new Thread(new Runnable() {
             @Override
@@ -63,6 +64,7 @@ public class FollowingActivity extends AppCompatActivity {
         }).start();
     }
 
+    //显示请求的回复
     private void showResponse (final Boolean isSearching) {
         runOnUiThread(new Runnable() {
             @Override
