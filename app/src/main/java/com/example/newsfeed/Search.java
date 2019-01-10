@@ -44,24 +44,9 @@ public class Search extends Activity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         sourceList = new ArrayList<>();
-//        getSourceList();
 
         handleIntent(getIntent());
         Log.d(TAG, "onCreate: SearchActivity onCreate");
-
-//        searchView = (SearchView) findViewById(R.id.searchview);
-//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                getSearchResult(query);
-//                return false;
-//            }
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-////                mAdapter.getFilter().filter(newText);
-//                return false;
-//            }
-//        });
 
 
     }

@@ -94,6 +94,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                 Intent intent = new Intent(context, SourceActivity.class);
                 intent.putExtra("source_id", source.getId());
                 intent.putExtra("source_name", source.getName());
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 context.startActivity(intent);
             }
         });

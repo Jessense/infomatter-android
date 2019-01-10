@@ -180,37 +180,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         searchView.setSearchableInfo(
                 searchManager.getSearchableInfo(getComponentName()));
         searchView.onActionViewExpanded();
-//        searchView.setIconifiedByDefault(true);
-//        searchView.setFocusable(true);
-//        searchView.requestFocusFromTouch();
-
-
-
 
         return true;
 
 
     }
-
-//    //菜单的点击事件
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-//
-//        switch (item.getItemId()){
-////            case R.id.action_search:
-////                Intent intent = new Intent(MainActivity.this, Search.class);
-////                startActivity(intent);
-////                break;
-//            case R.id.action_logout:
-//                user.setLogined(false);
-//                finish();
-//                break;
-//            default:
-//                break;
-//        }
-//
-//        return true;
-//    }
 
 
 
@@ -221,19 +195,20 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_favourites) {
-            // Handle the camera action
+            Toast.makeText(MainActivity.this, "敬请期待~", Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_following) {
             Intent inent = new Intent(MainActivity.this, FollowingActivity.class);
             startActivity(inent);
 
         } else if (id == R.id.nav_discovery) {
-//            Intent intent = new Intent(MainActivity.this, TestActivity.class);
-//            startActivity(intent);
+            Intent intent = new Intent(MainActivity.this, DiscoveryActivity.class);
+            startActivity(intent);
 
         } else if (id == R.id.nav_feedback) {
+            Toast.makeText(MainActivity.this, "敬请期待~", Toast.LENGTH_LONG).show();
 
         } else if (id == R.id.nav_settings) {
-
+            Toast.makeText(MainActivity.this, "敬请期待~", Toast.LENGTH_LONG).show();
         } else if (id == R.id.nav_logout) {
             user.setLogined(false);
             finish();
