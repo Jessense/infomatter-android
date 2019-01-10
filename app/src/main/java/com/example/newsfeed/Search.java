@@ -1,20 +1,14 @@
 package com.example.newsfeed;
 
-import android.app.Service;
-import android.content.Context;
+import android.app.Activity;
+import android.app.SearchManager;
+import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.text.Editable;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.view.WindowManager;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -28,17 +22,20 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class SubscribeActivity extends AppCompatActivity {
+import static android.content.ContentValues.TAG;
+
+public class Search extends Activity {
     private List<Source> sourceList;
+    private SearchView searchView;
     private RecyclerView recyclerView;
     private SourceAdapter adapter;
-    private EditText searchEdit;
     private Config config;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_subscribe);
+        setContentView(R.layout.activity_search);
 
         config = new Config();
 
@@ -47,26 +44,39 @@ public class SubscribeActivity extends AppCompatActivity {
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
         sourceList = new ArrayList<>();
-        getSourceList();
+//        getSourceList();
 
-        searchEdit = (EditText) findViewById(R.id.source_search);
-        searchEdit.setOnEditorActionListener(new EditText.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                    getSearchResult(searchEdit.getText().toString());
-//                }
+        handleIntent(getIntent());
+        Log.d(TAG, "onCreate: SearchActivity onCreate");
+
+//        searchView = (SearchView) findViewById(R.id.searchview);
+//        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                getSearchResult(query);
 //                return false;
-                boolean handled = false;
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    getSearchResult(searchEdit.getText().toString());
-                    handled = true;
-                }
-                return handled;
-            }
-        });
+//            }
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+////                mAdapter.getFilter().filter(newText);
+//                return false;
+//            }
+//        });
 
 
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        handleIntent(intent);
+    }
+
+    private void handleIntent(Intent intent) {
+
+        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+            String query = intent.getStringExtra(SearchManager.QUERY);
+            getSearchResult(query);
+        }
     }
 
 
@@ -76,6 +86,7 @@ public class SubscribeActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    Log.d(TAG, "onCreate: SearchActivity getSourceList");
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
                             .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/sources")
@@ -98,6 +109,7 @@ public class SubscribeActivity extends AppCompatActivity {
             @Override
             public void run() {
                 try {
+                    Log.d(TAG, "onCreate: SearchActivity getSearchResult");
                     HttpUrl request_url;
                     if(text.startsWith(config.getScheme())) {
                         request_url = new HttpUrl.Builder()
@@ -155,6 +167,7 @@ public class SubscribeActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                Log.d(TAG, "onCreate: SearchActivity showResponse");
                 adapter = new SourceAdapter(sourceList, isSearching, getApplicationContext());
                 recyclerView.setAdapter(adapter);
             }
@@ -165,7 +178,7 @@ public class SubscribeActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(SubscribeActivity.this, toastText, Toast.LENGTH_SHORT).show();
+                Toast.makeText(Search.this, toastText, Toast.LENGTH_SHORT).show();
             }
         });
     }

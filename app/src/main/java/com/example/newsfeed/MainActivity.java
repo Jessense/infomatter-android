@@ -1,5 +1,6 @@
 package com.example.newsfeed;
 
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +23,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.support.v7.widget.Toolbar;
@@ -37,6 +39,8 @@ import java.util.List;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+
+import static android.view.View.GONE;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     private List<Entry> entryList;
@@ -169,28 +173,44 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main,menu); //通过getMenuInflater()方法得到MenuInflater对象，再调用它的inflate()方法就可以给当前活动创建菜单了，第一个参数：用于指定我们通过哪一个资源文件来创建菜单；第二个参数：用于指定我们的菜单项将添加到哪一个Menu对象当中。
-        return true; // true：允许创建的菜单显示出来，false：创建的菜单将无法显示。
-    }
+        SearchManager searchManager =
+                (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        final SearchView searchView =
+                (SearchView) menu.findItem(R.id.search).getActionView();
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(getComponentName()));
+        searchView.onActionViewExpanded();
+//        searchView.setIconifiedByDefault(true);
+//        searchView.setFocusable(true);
+//        searchView.requestFocusFromTouch();
 
-    //菜单的点击事件
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
 
-        switch (item.getItemId()){
-            case R.id.action_search:
-                Intent intent = new Intent(MainActivity.this, SubscribeActivity.class);
-                startActivity(intent);
-                break;
-            case R.id.action_logout:
-                user.setLogined(false);
-                finish();
-                break;
-            default:
-                break;
-        }
+
 
         return true;
+
+
     }
+
+//    //菜单的点击事件
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//
+//        switch (item.getItemId()){
+////            case R.id.action_search:
+////                Intent intent = new Intent(MainActivity.this, Search.class);
+////                startActivity(intent);
+////                break;
+//            case R.id.action_logout:
+//                user.setLogined(false);
+//                finish();
+//                break;
+//            default:
+//                break;
+//        }
+//
+//        return true;
+//    }
 
 
 
