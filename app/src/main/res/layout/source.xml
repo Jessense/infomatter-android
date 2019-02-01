@@ -10,11 +10,13 @@
         <TextView
             android:id="@+id/source_name"
             android:layout_width="240dp"
+            android:layout_marginLeft="10dp"
             android:padding="20dp"
             android:layout_height="60dp" />
         <Button
             android:id="@+id/button_follow"
             android:gravity="center"
+            android:layout_marginRight="10dp"
             android:background="@drawable/btn_bg_blue"
             android:layout_width="100dp"
             android:layout_height="40dp" />

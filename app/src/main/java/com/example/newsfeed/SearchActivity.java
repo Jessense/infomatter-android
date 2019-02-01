@@ -1,18 +1,20 @@
 package com.example.newsfeed;
 
 import android.app.Activity;
-import android.app.SearchManager;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.lapism.searchview.Search;
+import com.lapism.searchview.widget.SearchBar;
+import com.lapism.searchview.widget.SearchView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,13 +26,13 @@ import okhttp3.Response;
 
 import static android.content.ContentValues.TAG;
 
-public class Search extends Activity {
+public class SearchActivity extends AppCompatActivity {
     private List<Source> sourceList;
     private SearchView searchView;
     private RecyclerView recyclerView;
     private SourceAdapter adapter;
     private Config config;
-
+    private String query;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,53 +41,40 @@ public class Search extends Activity {
 
         config = new Config();
 
-        recyclerView = (RecyclerView) findViewById(R.id.source_list);
-        recyclerView.setHasFixedSize(true);
+        Intent intent = getIntent();
+        query = intent.getStringExtra("query");
+        Log.d(TAG, "onCreate: query:" + query);
+
+
+        setSearchView();
+
+
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
         sourceList = new ArrayList<>();
+        getSearchResult(query);
 
-        handleIntent(getIntent());
-        Log.d(TAG, "onCreate: SearchActivity onCreate");
 
 
     }
 
-    @Override
-    protected void onNewIntent(Intent intent) {
-        handleIntent(intent);
-    }
-
-    private void handleIntent(Intent intent) {
-
-        if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
-            String query = intent.getStringExtra(SearchManager.QUERY);
-            getSearchResult(query);
-        }
-    }
-
-
-    //获取内容源列表
-    private void getSourceList() {
-        new Thread(new Runnable() {
+    void setSearchView() {
+        searchView = (SearchView) findViewById(R.id.searchView);
+        searchView.setOnQueryTextListener(new Search.OnQueryTextListener() {
             @Override
-            public void run() {
-                try {
-                    Log.d(TAG, "onCreate: SearchActivity getSourceList");
-                    OkHttpClient client = new OkHttpClient();
-                    Request request = new Request.Builder()
-                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/sources")
-                            .build();
-                    Response response = client.newCall(request).execute();
-                    String responseData = response.body().string();
-                    Gson gson = new Gson();
-                    sourceList = gson.fromJson(responseData, new TypeToken<List<Source>>(){}.getType());
-                    showResponse(false);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+            public boolean onQueryTextSubmit(CharSequence query) {
+                getSearchResult((String) query);
+                return true;
             }
-        }).start();
+
+            @Override
+            public void onQueryTextChange(CharSequence newText) {
+
+            }
+        });
+        searchView.setQuery(query, false);
     }
 
     //获取搜索结果列表
@@ -163,7 +152,7 @@ public class Search extends Activity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(Search.this, toastText, Toast.LENGTH_SHORT).show();
+                Toast.makeText(SearchActivity.this, toastText, Toast.LENGTH_SHORT).show();
             }
         });
     }
