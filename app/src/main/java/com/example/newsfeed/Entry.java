@@ -12,6 +12,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.Date;
 
 public class Entry {
+    private int id;
     private String title;
     private String link;
     private String time;
@@ -20,10 +21,15 @@ public class Entry {
     private String photo; //封面图片链接
     private String content;
 
-    public Entry(String title, String link, String time) {
+    public Entry(int id, String title, String link, String time) {
         this.title = title;
         this.link = link;
         this.time = time;
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
     public String getTitle() {
         return title;
@@ -99,6 +105,28 @@ public class Entry {
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    public String getSQLTime() {
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+        System.out.print("time:"+time);
+        TemporalAccessor accessor = timeFormatter.parse(time);
+        Date pubDate = Date.from(Instant.from(accessor));
+        LocalDateTime localPubDate = pubDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+        return String.valueOf(localPubDate);
+
+//        String pub_second = String.format("%02d", localPubDate.getSecond());
+//        String pub_minute = String.format("%02d", localPubDate.getMinute());
+//        String pub_year  = String.format("%04d", localPubDate.plusHours(8).getYear());
+//        String pub_month = String.format("%02d", localPubDate.plusHours(8).getMonthValue());
+//        String pub_day   = String.format("%02d", localPubDate.plusHours(8).getDayOfMonth());
+//        String pub_hour = String.format("%02d", localPubDate.plusHours(8).getHour());
+
+
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
     public void setTitle(String title) {
         this.title = title;
     }

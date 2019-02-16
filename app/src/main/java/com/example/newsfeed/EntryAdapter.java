@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -52,6 +53,10 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private final int ENTRY_WHITOUT_COVER = 1;
     private final int ENTRY_WITH_COVER = 2;
     private final int ENTRY_WEIBO = 3;
+    private final int FOOT_VIEW = 4;
+
+    private final boolean hasMore = true;
+    private final boolean fadeTips = false;
 
     private List<Entry> mEntryList;
     private Context context;
@@ -105,11 +110,23 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
 
+    class FootHolder extends RecyclerView.ViewHolder {
+        private ProgressBar progressBar;
+
+        public FootHolder(View itemView) {
+            super(itemView);
+            progressBar = itemView.findViewById(R.id.progressBar1);
+        }
+    }
+
+
 
 
     @Override
     public int getItemViewType(int position) {
-        if (mEntryList.get(position).getLink().indexOf("weibo.com") != -1 || mEntryList.get(position).getLink().indexOf("weibo.cn") != -1) {
+        if (position == getItemCount() - 1) {
+            return FOOT_VIEW;
+        } else if (mEntryList.get(position).getLink().indexOf("weibo.com") != -1 || mEntryList.get(position).getLink().indexOf("weibo.cn") != -1) {
             return ENTRY_WEIBO;
         } else if (mEntryList.get(position).getPhoto() == null || mEntryList.get(position).getPhoto().equals("")
                 || mEntryList.get(position).getSourceId().equals("19") || mEntryList.get(position).getSourceId().equals("15")) { //无封面图的文章
@@ -126,7 +143,11 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 //                .inflate(R.layout.entry, parent, false);
 //        SourceAdapter.ViewHolder holder = new SourceAdapter.ViewHolder(view);
         View view;
-        if (viewType == ENTRY_WEIBO) {
+        if (viewType == FOOT_VIEW) {
+            view = LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.footview, parent, false);
+            return new FootHolder(view);
+        } else if (viewType == ENTRY_WEIBO) {
             view = LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.entry_weibo, parent, false);
             return new EntryViewHolderWeibo(view); //TODO
@@ -146,9 +167,12 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-        final Entry entry = mEntryList.get(position);
 
-        if (holder instanceof EntryViewHolder) {
+        if (holder instanceof  FootHolder) {
+          FootHolder viewHolder = (FootHolder) holder;
+          viewHolder.progressBar.setIndeterminate(true);
+        } else if (holder instanceof EntryViewHolder) {
+            final Entry entry = mEntryList.get(position);
             EntryViewHolder viewHolder = (EntryViewHolder) holder;
             viewHolder.entryTitle.setText(entry.getTitle());
             viewHolder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
@@ -188,6 +212,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             });
 
         } else if (holder instanceof EntryViewHolderWithoutCover) {
+            final Entry entry = mEntryList.get(position);
             EntryViewHolderWithoutCover viewHolder = (EntryViewHolderWithoutCover) holder;
             viewHolder.entryTitle.setText(entry.getTitle());
             viewHolder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
@@ -223,8 +248,16 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 }
             });
         } else if (holder instanceof EntryViewHolderWeibo){
+            final Entry entry = mEntryList.get(position);
             EntryViewHolderWeibo viewHolder = (EntryViewHolderWeibo) holder;
-            viewHolder.entryContent.setText(Html.fromHtml(entry.getContent().replaceAll("<img.+?>", "")));
+//            Pattern pattern = Pattern.compile("<img.+?><br><br>");
+//            Matcher matcher = pattern.matcher(entry.getContent());
+//            String result = matcher.replaceAll("");
+            String str1 = entry.getContent();
+            String str2 = str1.replaceAll("<img.+?><br><br>", "");
+            String result = str2.replaceAll("<img.+?>", "");
+            viewHolder.entryContent.setText(Html.fromHtml(result));
+//            viewHolder.entryContent.setText(Html.fromHtml(entry.getContent().replaceAll("<img.+?>", "")));
 //            viewHolder.entryContent.setText(Html.fromHtml(entry.getContent()));
             viewHolder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
 
@@ -317,6 +350,25 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return mEntryList.size();
+        return mEntryList.size() + 1;
+    }
+
+    public void resetList() {
+        mEntryList = new ArrayList<>();
+    }
+
+    public void updateList(List<Entry> newEntries) {
+        if (newEntries != null) {
+            mEntryList.addAll(newEntries);
+        }
+        notifyDataSetChanged();
+    }
+
+    public int getLastId() {
+        return mEntryList.get(mEntryList.size()-1).getId();
+    }
+
+    public String getLastTime() {
+        return mEntryList.get(mEntryList.size()-1).getTime();
     }
 }

@@ -39,12 +39,11 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/black"
                 android:textSize="16dp"
-                android:letterSpacing="0.05"
                 android:lineSpacingExtra="2dp"
                 android:layout_alignParentTop="true"
                 android:layout_alignParentLeft="true"
-
-                android:layout_toLeftOf="@+id/entry_cover"/>
+                android:layout_toLeftOf="@+id/entry_cover"
+                android:maxLines="3"/>
 
             <TextView
                 android:id="@+id/entry_source_time"

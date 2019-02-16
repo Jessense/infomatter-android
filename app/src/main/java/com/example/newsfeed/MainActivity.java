@@ -4,7 +4,10 @@ import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -29,7 +32,13 @@ import com.lzy.ninegrid.NineGridView;
 import com.lapism.searchview.widget.SearchView;
 import com.squareup.picasso.Picasso;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import okhttp3.OkHttpClient;
@@ -44,6 +53,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Config config;
     private SwipeRefreshLayout swipeRefresh;
     private SearchView searchView;
+    private int lastVisibleItem = 0;
+    private int last_id = 1000000;
+    private String last_time = "9999-12-31 23:59:59";
+    private int batch_size = 15;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,14 +96,52 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         } else { //如果用户已登录，则进入主页显示时间线
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             recyclerView.setHasFixedSize(true);
-            LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+            final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
             recyclerView.setLayoutManager(layoutManager);
+            recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                @RequiresApi(api = Build.VERSION_CODES.O)
+                @Override
+                public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                    super.onScrollStateChanged(recyclerView, newState);
+                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
+                        if (lastVisibleItem == adapter.getItemCount() - 1) {
+                            last_time = adapter.getLastTime();
+                            last_id = adapter.getLastId();
+                            DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+                            TemporalAccessor accessor = timeFormatter.parse(last_time);
+                            Date pubDate = Date.from(Instant.from(accessor));
+                            LocalDateTime localPubDate = pubDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                            String temp = localPubDate.toString();
+                            last_time = temp.substring(0, 10) + " " + temp.substring(11, 16);
+                            if (temp.length() < 19) {
+                                last_time += ":00";
+                            } else {
+                                last_time += temp.substring(16, 19);
+                            }
+                            Log.d("MainActivity", "onScrollStateChanged: localPubDate" + localPubDate);
+                            Log.d("MainActivity", "onScrollStateChanged: last_time=" + last_time);
+                            Log.d("MainActivity", "onScrollStateChanged: last_id=" + last_id);
+                            getEntryList();
+                        }
+                    }
+                }
+
+                @Override
+                public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                    super.onScrolled(recyclerView, dx, dy);
+                    lastVisibleItem = layoutManager.findLastCompletelyVisibleItemPosition();
+                }
+            });
             entryList = new ArrayList<>();
-            getEntryList();
+            getEntryList1();
         }
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                adapter.resetList();
+                entryList = new ArrayList<>();
+                last_id = 0;
+                last_time = "9999-12-31 23:59:59";
                 getEntryList();
             }
         });
@@ -145,11 +197,40 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     LinearLayoutManager layoutManager = new LinearLayoutManager(this);
                     recyclerView.setLayoutManager(layoutManager);
                     entryList = new ArrayList<>();
-                    getEntryList();
+                    getEntryList1();
                 }
                 break;
              default:
         }
+    }
+
+    private void getEntryList1() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OkHttpClient client = new OkHttpClient();
+                    Log.d("MainActivity", "getEntryList1: last_time=" + last_time);
+                    Log.d("MainActivity", "getEntryList1: last_id=" + last_id);
+                    Request request = new Request.Builder()
+                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/timeline_batch")
+                            .addHeader("user_id", user.getId())
+                            .addHeader("last_time", last_time)
+                            .addHeader("last_id", String.valueOf(last_id))
+                            .addHeader("batch_size", String.valueOf(batch_size))
+                            .build();
+                    Response response = client.newCall(request).execute();
+                    String responseData = response.body().string();
+                    Log.d("MainActivity", "run: getEntryList1:" + responseData);
+                    Gson gson = new Gson();
+                    entryList = gson.fromJson(responseData, new TypeToken<List<Entry>>(){}.getType());
+                    showResponse();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                swipeRefresh.setRefreshing(false);
+            }
+        }).start();
     }
 
     //获取Entry列表
@@ -160,14 +241,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Request request = new Request.Builder()
-                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/timeline")
+                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/timeline_batch")
                             .addHeader("user_id", user.getId())
+                            .addHeader("last_time", last_time)
+                            .addHeader("last_id", String.valueOf(last_id))
+                            .addHeader("batch_size", String.valueOf(batch_size))
                             .build();
                     Response response = client.newCall(request).execute();
                     String responseData = response.body().string();
                     Gson gson = new Gson();
-                    entryList = gson.fromJson(responseData, new TypeToken<List<Entry>>(){}.getType());
-                    showResponse();
+                    List<Entry> newData = gson.fromJson(responseData, new TypeToken<List<Entry>>(){}.getType());
+                    adapter.updateList(newData);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

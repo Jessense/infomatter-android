@@ -37,7 +37,7 @@
                 android:textColor="@color/black"
                 android:textColorLink="@color/black"
                 android:textSize="14dp"
-                android:letterSpacing="0.05"
+                android:maxLines="6"
                 android:lineSpacingExtra="2dp"/>
 
             <TextView
