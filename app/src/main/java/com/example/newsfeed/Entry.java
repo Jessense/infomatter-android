@@ -14,6 +14,7 @@ import java.util.Date;
 public class Entry {
     private int id;
     private String title;
+    private String digest;
     private String link;
     private String time;
     private String source_id;
@@ -54,9 +55,10 @@ public class Entry {
     public String getSourceName() {
         return source_name;
     }
-    //    public String getSource() {
-//        return source;
-//    }
+
+    public String getDigest() {
+        return digest;
+    }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     public String geLocalPubTime() {
@@ -78,17 +80,26 @@ public class Entry {
         String pub_day;
         String pub_hour;
         String pub_minute = String.format("%02d", localPubDate.getMinute());
-        if (localPubDate.plusHours(8).isAfter(localDate)) {
+
+        if (this.id <= 142052) {
+            if (localPubDate.plusHours(8).isAfter(localDate)) {
+                pub_year  = String.format("%04d", localPubDate.getYear());
+                pub_month = String.format("%02d", localPubDate.getMonthValue());
+                pub_day   = String.format("%02d", localPubDate.getDayOfMonth());
+                pub_hour = String.format("%02d", localPubDate.getHour());
+            } else {
+                pub_year  = String.format("%04d", localPubDate.plusHours(8).getYear());
+                pub_month = String.format("%02d", localPubDate.plusHours(8).getMonthValue());
+                pub_day   = String.format("%02d", localPubDate.plusHours(8).getDayOfMonth());
+                pub_hour = String.format("%02d", localPubDate.plusHours(8).getHour());
+            }
+        } else {
             pub_year  = String.format("%04d", localPubDate.getYear());
             pub_month = String.format("%02d", localPubDate.getMonthValue());
             pub_day   = String.format("%02d", localPubDate.getDayOfMonth());
             pub_hour = String.format("%02d", localPubDate.getHour());
-        } else {
-            pub_year  = String.format("%04d", localPubDate.plusHours(8).getYear());
-            pub_month = String.format("%02d", localPubDate.plusHours(8).getMonthValue());
-            pub_day   = String.format("%02d", localPubDate.plusHours(8).getDayOfMonth());
-            pub_hour = String.format("%02d", localPubDate.plusHours(8).getHour());
         }
+
 
 
 
@@ -149,5 +160,9 @@ public class Entry {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public void setDigest(String digest) {
+        this.digest = digest;
     }
 }

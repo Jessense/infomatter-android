@@ -240,6 +240,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             public void run() {
                 try {
                     OkHttpClient client = new OkHttpClient();
+                    Log.d("MainActivity", "getEntryList1: last_time=" + last_time);
+                    Log.d("MainActivity", "getEntryList1: last_id=" + last_id);
                     Request request = new Request.Builder()
                             .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/timeline_batch")
                             .addHeader("user_id", user.getId())

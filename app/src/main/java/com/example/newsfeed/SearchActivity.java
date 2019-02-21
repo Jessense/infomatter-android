@@ -85,7 +85,7 @@ public class SearchActivity extends AppCompatActivity {
                 try {
                     Log.d(TAG, "onCreate: SearchActivity getSearchResult");
                     HttpUrl request_url;
-                    if(text.startsWith(config.getScheme())) {
+                    if(text.startsWith("http") || text.startsWith("https")) {
                         request_url = new HttpUrl.Builder()
                                 .scheme(config.getScheme())
                                 .host(config.getHost())
@@ -121,6 +121,7 @@ public class SearchActivity extends AppCompatActivity {
                             .build();
                     Response response = client.newCall(request).execute();
                     String responseData = response.body().string();
+                    Log.d(TAG, "run: search responseData: " + responseData);
                     if (responseData.equals("NOTFOUND")) {
                         Log.d("SubscribeActivity", "run: no matches");
                         showToast("No Matches!");

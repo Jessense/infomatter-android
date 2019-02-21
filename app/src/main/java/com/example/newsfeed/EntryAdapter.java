@@ -70,13 +70,17 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     //带封面图的文章类Entry
     public static class EntryViewHolder extends RecyclerView.ViewHolder {
         private TextView entryTitle;
-        private TextView entrySourceTime;
+        private TextView entrySource;
+        private TextView entryTime;
+        private TextView entryDigest;
         private ImageView entryPhoto;
         private CardView entryCard;
         private EntryViewHolder(View view) {
             super(view);
-            entryTitle = (TextView) view.findViewById(R.id.entry_name);
-            entrySourceTime = (TextView) view.findViewById(R.id.entry_source_time);
+            entryTitle = (TextView) view.findViewById(R.id.entry_title);
+            entrySource = (TextView) view.findViewById(R.id.entry_source);
+            entryTime = (TextView) view.findViewById(R.id.entry_time);
+            entryDigest = (TextView) view.findViewById(R.id.entry_digest);
             entryPhoto = (ImageView) view.findViewById(R.id.entry_cover);
             entryCard = (CardView) view.findViewById(R.id.entry_card);
         }
@@ -98,13 +102,15 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     //微博类Entry，可以显示微博正文和九图
     public static class EntryViewHolderWeibo extends RecyclerView.ViewHolder {
         private TextView entryContent;
-        private TextView entrySourceTime;
+        private TextView entrySource;
+        private TextView entryTime;
         private CardView entryCard;
         private NineGridView nineGridView;
         private EntryViewHolderWeibo(View view) {
             super(view);
-            entryContent = (TextView) view.findViewById(R.id.entry_content_weibo);
-            entrySourceTime = (TextView) view.findViewById(R.id.entry_source_time_weibo);
+            entryContent = (TextView) view.findViewById(R.id.entry_content);
+            entrySource = (TextView) view.findViewById(R.id.entry_source);
+            entryTime = (TextView) view.findViewById(R.id.entry_time);
             entryCard = (CardView) view.findViewById(R.id.entry_card_weibo);
             nineGridView = (NineGridView) view.findViewById(R.id.nineGrid);
         }
@@ -131,7 +137,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else if (mEntryList.get(position).getPhoto() == null || mEntryList.get(position).getPhoto().equals("")
                 || mEntryList.get(position).getSourceId().equals("19") || mEntryList.get(position).getSourceId().equals("15")) { //无封面图的文章
             /*TODO: 消除硬编码，不要直接用source_id做判断条件，否则删除这个source后或者重新添加时肯会出问题*/
-            return ENTRY_WHITOUT_COVER;
+            return ENTRY_WITH_COVER;
         } else {
             return ENTRY_WITH_COVER; //有封面图的文章
         }
@@ -175,10 +181,21 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             final Entry entry = mEntryList.get(position);
             EntryViewHolder viewHolder = (EntryViewHolder) holder;
             viewHolder.entryTitle.setText(entry.getTitle());
-            viewHolder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
-            Picasso.get()
-                    .load(entry.getPhoto())
-                    .into(viewHolder.entryPhoto);
+            viewHolder.entrySource.setText(entry.getSourceName());
+            viewHolder.entryTime.setText(entry.geLocalPubTime());
+            if (entry.getDigest() == null || entry.getDigest().length() > 0) {
+                viewHolder.entryDigest.setText(entry.getDigest());
+            } else {
+                viewHolder.entryDigest.setText(Html2Text(entry.getContent()).substring(0, 500));
+            }
+            if (entry.getPhoto().length() == 0)
+                viewHolder.entryPhoto.setVisibility(View.GONE);
+            else {
+                Picasso.get()
+                        .load(entry.getPhoto())
+                        .placeholder(R.color.gainsboro)
+                        .into(viewHolder.entryPhoto);
+            }
 
             ((EntryViewHolder) holder).entryCard.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -256,10 +273,12 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             String str1 = entry.getContent();
             String str2 = str1.replaceAll("<img.+?><br><br>", "");
             String result = str2.replaceAll("<img.+?>", "");
-            viewHolder.entryContent.setText(Html.fromHtml(result));
+            viewHolder.entryContent.setText(Html2Text(entry.getContent()));
 //            viewHolder.entryContent.setText(Html.fromHtml(entry.getContent().replaceAll("<img.+?>", "")));
 //            viewHolder.entryContent.setText(Html.fromHtml(entry.getContent()));
-            viewHolder.entrySourceTime.setText(entry.getSourceName() + " / " + entry.geLocalPubTime());
+            viewHolder.entrySource.setText(entry.getSourceName());
+            viewHolder.entryTime.setText(entry.geLocalPubTime());
+
 
             ArrayList<ImageInfo> imageInfo = new ArrayList<>();
             List<String> imageDetails = getAttachments(entry.getContent());
@@ -336,6 +355,36 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         }
         return list;
+    }
+
+
+    public static String Html2Text(String inputString){
+        String htmlStr = inputString; //含html标签的字符串
+        String textStr ="";
+        java.util.regex.Pattern p_script;
+        java.util.regex.Matcher m_script;
+        java.util.regex.Pattern p_style;
+        java.util.regex.Matcher m_style;
+        java.util.regex.Pattern p_html;
+        java.util.regex.Matcher m_html;
+        try{
+            String regEx_script = "<[\\s]*?script[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?script[\\s]*?>"; //定义script的正则表达式{或<script[^>]*?>[\\s\\S]*?<\\/script> }
+            String regEx_style = "<[\\s]*?style[^>]*?>[\\s\\S]*?<[\\s]*?\\/[\\s]*?style[\\s]*?>"; //定义style的正则表达式{或<style[^>]*?>[\\s\\S]*?<\\/style> }
+            String regEx_html = "<[^>]+>"; //定义HTML标签的正则表达式
+            p_script = Pattern.compile(regEx_script,Pattern.CASE_INSENSITIVE);
+            m_script = p_script.matcher(htmlStr);
+            htmlStr = m_script.replaceAll(""); //过滤script标签
+            p_style = Pattern.compile(regEx_style,Pattern.CASE_INSENSITIVE);
+            m_style = p_style.matcher(htmlStr);
+            htmlStr = m_style.replaceAll(""); //过滤style标签
+            p_html = Pattern.compile(regEx_html,Pattern.CASE_INSENSITIVE);
+            m_html = p_html.matcher(htmlStr);
+            htmlStr = m_html.replaceAll(""); //过滤html标签
+            textStr = htmlStr;
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+        return textStr;//返回文本字符串
     }
 
     //判断用户是否安装了某个程序，用于判断用户是否安装了chrome浏览器

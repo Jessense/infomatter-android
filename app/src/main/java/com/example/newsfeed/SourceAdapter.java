@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -48,10 +49,12 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView sourceName;
         public Button followButton;
+        public ImageView sourcePhoto;
         public ViewHolder(View view) {
             super(view);
             sourceName = (TextView) view.findViewById(R.id.source_name);
             followButton = (Button) view.findViewById(R.id.button_follow);
+            sourcePhoto = (ImageView) view.findViewById(R.id.source_photo);
         }
     }
 
@@ -98,6 +101,10 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                 context.startActivity(intent);
             }
         });
+
+        Picasso.get()
+                .load(source.getPhoto())
+                .into(holder.sourcePhoto);
 
 
         //用户点添加、关注、取关按钮，分别异步执行三种任务

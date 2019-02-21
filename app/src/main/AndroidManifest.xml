@@ -22,7 +22,8 @@
         </activity>
         <activity android:name=".WebviewActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".SourceActivity" />
+        <activity android:name=".SourceActivity"
+            android:parentActivityName=".FollowingActivity"/>
         <activity android:name=".FollowingActivity"
             android:parentActivityName=".MainActivity"/>
         <activity android:name=".SearchActivity">
