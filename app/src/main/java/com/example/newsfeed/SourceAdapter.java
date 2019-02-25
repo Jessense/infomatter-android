@@ -3,6 +3,7 @@ package com.example.newsfeed;
 import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -38,6 +39,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 
 import static android.content.ContentValues.TAG;
+import static android.content.Context.MODE_PRIVATE;
 
 public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder> {
     private List<Source> mSourceList;
@@ -80,6 +82,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         final Source source = mSourceList.get(position);
 
         holder.sourceName.setText(source.getName());
+
         GetRelationTask getRelationTask = new GetRelationTask(holder.followButton);
         getRelationTask.executeOnExecutor(Executors.newCachedThreadPool(), source);
 
@@ -102,9 +105,12 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
             }
         });
 
-        Picasso.get()
-                .load(source.getPhoto())
-                .into(holder.sourcePhoto);
+        if (source.getPhoto().length() > 0) {
+            storeSourcePhoto(source.getId(), source.getPhoto());
+            Picasso.get()
+                    .load(source.getPhoto())
+                    .into(holder.sourcePhoto);
+        }
 
 
         //用户点添加、关注、取关按钮，分别异步执行三种任务
@@ -323,7 +329,19 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
     }
 
 
+    public void storeSourcePhoto(String source_id, String photo_url) {
+        SharedPreferences sp = context.getSharedPreferences("SourcePhotoUrl", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(source_id,"");    // 先清空原始数据
+        editor.putString(source_id, photo_url);
+        editor.commit();
+    }
 
+    public String getStoredPhotoUrl(String source_id) {
+        SharedPreferences sp = context.getSharedPreferences("SourcePhotoUrl", MODE_PRIVATE);
+        String result = sp.getString(source_id, "");
+        return result;
+    }
 
 
     @Override

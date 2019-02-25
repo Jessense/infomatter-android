@@ -3,6 +3,7 @@ package com.example.newsfeed;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,6 +33,7 @@ import com.lzy.ninegrid.ImageInfo;
 import com.lzy.ninegrid.NineGridView;
 import com.lzy.ninegrid.preview.NineGridViewClickAdapter;
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Transformation;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -49,6 +51,8 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.content.Context.MODE_PRIVATE;
+
 public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int ENTRY_WHITOUT_COVER = 1;
     private final int ENTRY_WITH_COVER = 2;
@@ -60,10 +64,12 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     private List<Entry> mEntryList;
     private Context context;
+    private Config config;
 
     public EntryAdapter (List<Entry> entryList, Context context) {
         this.mEntryList = entryList;
         this.context = context;
+        this.config = new Config();
     }
 
 
@@ -74,6 +80,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         private TextView entryTime;
         private TextView entryDigest;
         private ImageView entryPhoto;
+        private ImageView sourcePhoto;
         private CardView entryCard;
         private EntryViewHolder(View view) {
             super(view);
@@ -82,6 +89,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             entryTime = (TextView) view.findViewById(R.id.entry_time);
             entryDigest = (TextView) view.findViewById(R.id.entry_digest);
             entryPhoto = (ImageView) view.findViewById(R.id.entry_cover);
+            sourcePhoto = (ImageView) view.findViewById(R.id.source_photo);
             entryCard = (CardView) view.findViewById(R.id.entry_card);
         }
     }
@@ -186,15 +194,64 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             if (entry.getDigest() == null || entry.getDigest().length() > 0) {
                 viewHolder.entryDigest.setText(entry.getDigest());
             } else {
-                viewHolder.entryDigest.setText(Html2Text(entry.getContent()).substring(0, 500));
+                viewHolder.entryDigest.setText(Html2Text(entry.getContent()));
             }
-            if (entry.getPhoto().length() == 0)
-                viewHolder.entryPhoto.setVisibility(View.GONE);
-            else {
+            Transformation transformation = new Transformation() {
+
+                @Override
+                public Bitmap transform(Bitmap source) {
+
+                    int targetWidth = 1200;
+//                    LogCat.i("source.getHeight()="+source.getHeight()+",source.getWidth()="+source.getWidth()+",targetWidth="+targetWidth);
+
+                    if(source.getWidth()==0){
+                        return source;
+                    }
+
+                    //如果图片小于设置的宽度，则返回原图
+                    if(source.getWidth()<targetWidth){
+                        return source;
+                    }else{
+                        //如果图片大小大于等于设置的宽度，则按照设置的宽度比例来缩放
+                        double aspectRatio = (double) source.getHeight() / (double) source.getWidth();
+                        int targetHeight = (int) (targetWidth * aspectRatio);
+                        if (targetHeight != 0 && targetWidth != 0) {
+                            Bitmap result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false);
+                            if (result != source) {
+                                // Same bitmap is returned if sizes are the same
+                                source.recycle();
+                            }
+                            return result;
+                        } else {
+                            return source;
+                        }
+                    }
+
+                }
+
+                @Override
+                public String key() {
+                    return "transformation" + " desiredWidth";
+                }
+            };
+
+            if (getStoredPhotoUrl(String.valueOf(entry.getSourceId())) == "NULL") {
+                GetSourcePhotoTask getSourcePhotoTask = new GetSourcePhotoTask(viewHolder.entryPhoto);
+                getSourcePhotoTask.executeOnExecutor(Executors.newCachedThreadPool(), entry.getSourceId());
+            } else {
+                Picasso.get()
+                        .load(getStoredPhotoUrl(String.valueOf(entry.getSourceId())))
+                        .into(viewHolder.sourcePhoto);
+            }
+
+            if (entry.getPhoto().length() > 0)
                 Picasso.get()
                         .load(entry.getPhoto())
                         .placeholder(R.color.gainsboro)
+                        .transform(transformation)
                         .into(viewHolder.entryPhoto);
+            else {
+                viewHolder.entryPhoto.setVisibility(View.GONE);
             }
 
             ((EntryViewHolder) holder).entryCard.setOnClickListener(new View.OnClickListener() {
@@ -419,5 +476,60 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public String getLastTime() {
         return mEntryList.get(mEntryList.size()-1).getTime();
+    }
+
+    public void storeSourcePhoto(String source_id, String photo_url) {
+        SharedPreferences sp = context.getSharedPreferences("SourcePhotoUrl", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString(source_id,"");    // 先清空原始数据
+        editor.putString(source_id, photo_url);
+        editor.commit();
+    }
+
+    public String getStoredPhotoUrl(String source_id) {
+        SharedPreferences sp = context.getSharedPreferences("SourcePhotoUrl", MODE_PRIVATE);
+        String result = sp.getString(source_id, "NULL");
+        return result;
+    }
+
+    class GetSourcePhotoTask extends AsyncTask<String, Void, String> {
+        private ImageView sourcePhoto;
+        String source_id;
+        public GetSourcePhotoTask(ImageView imageView) {
+            sourcePhoto = imageView;
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+            source_id = params[0];
+            try {
+                OkHttpClient client = new OkHttpClient();
+
+
+                Request request = new Request.Builder()
+                        .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/sources/value?field=photo")
+                        .addHeader("source_id", source_id)
+                        .build();
+                Response response = client.newCall(request).execute();
+                String responseData = response.body().string();
+                JSONObject jsonObject = new JSONObject(responseData);
+                String result = jsonObject.getString("photo");
+                return result;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            super.onPostExecute(result);
+            storeSourcePhoto(source_id, result);
+            if (result.length() > 0) {
+                Picasso.get()
+                        .load(result)
+                        .into(sourcePhoto);
+            }
+        }
     }
 }

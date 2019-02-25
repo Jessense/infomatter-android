@@ -1,5 +1,10 @@
 package com.example.newsfeed;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+
+import static android.content.Context.MODE_PRIVATE;
+
 public class Source {
     private String id;
     private String name;
