@@ -311,7 +311,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         int id = item.getItemId();
 
         if (id == R.id.nav_favourites) {
-            Toast.makeText(MainActivity.this, "敬请期待~", Toast.LENGTH_LONG).show();
+            Intent inent = new Intent(MainActivity.this, StarsActivity.class);
+            startActivity(inent);
         } else if (id == R.id.nav_following) {
             Intent inent = new Intent(MainActivity.this, FollowingActivity.class);
             startActivity(inent);

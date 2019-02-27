@@ -22,17 +22,24 @@
         </activity>
         <activity android:name=".WebviewActivity" />
         <activity android:name=".LoginActivity" />
-        <activity android:name=".SourceActivity"
-            android:parentActivityName=".FollowingActivity"/>
-        <activity android:name=".FollowingActivity"
-            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".SourceActivity"
+            android:parentActivityName=".FollowingActivity" />
+        <activity
+            android:name=".FollowingActivity"
+            android:parentActivityName=".MainActivity" />
         <activity android:name=".SearchActivity">
             <intent-filter>
                 <action android:name="android.intent.action.SEARCH" />
             </intent-filter>
         </activity>
-        <activity android:name=".DiscoveryActivity"
-            android:parentActivityName=".MainActivity"/>
+        <activity
+            android:name=".DiscoveryActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity
+            android:name=".StarsActivity"
+            android:parentActivityName=".MainActivity" />
+        <activity android:name=".FullCoverageActivity"></activity>
     </application>
 
 </manifest>

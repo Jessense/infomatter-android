@@ -19,14 +19,19 @@ import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.lzy.ninegrid.ImageInfo;
@@ -51,7 +56,10 @@ import okhttp3.Request;
 import okhttp3.RequestBody;
 import okhttp3.Response;
 
+import static android.content.ContentValues.TAG;
+import static android.content.Context.MEDIA_PROJECTION_SERVICE;
 import static android.content.Context.MODE_PRIVATE;
+import static android.view.Gravity.BOTTOM;
 
 public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final int ENTRY_WHITOUT_COVER = 1;
@@ -65,11 +73,13 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<Entry> mEntryList;
     private Context context;
     private Config config;
+    private User user;
 
     public EntryAdapter (List<Entry> entryList, Context context) {
         this.mEntryList = entryList;
         this.context = context;
         this.config = new Config();
+        this.user = new User(context);
     }
 
 
@@ -82,6 +92,9 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         private ImageView entryPhoto;
         private ImageView sourcePhoto;
         private CardView entryCard;
+        private ImageView entryOption;
+        private PopupMenu popupMenu;
+        private ImageView entryMore;
         private EntryViewHolder(View view) {
             super(view);
             entryTitle = (TextView) view.findViewById(R.id.entry_title);
@@ -91,6 +104,10 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             entryPhoto = (ImageView) view.findViewById(R.id.entry_cover);
             sourcePhoto = (ImageView) view.findViewById(R.id.source_photo);
             entryCard = (CardView) view.findViewById(R.id.entry_card);
+            entryOption = (ImageView) view.findViewById(R.id.entry_option);
+            entryMore = (ImageView) view.findViewById(R.id.entry_cluster);
+            popupMenu = new PopupMenu(entryOption.getContext(), entryOption);
+            popupMenu.inflate(R.menu.entry_option);
         }
     }
 
@@ -187,10 +204,70 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
           viewHolder.progressBar.setIndeterminate(true);
         } else if (holder instanceof EntryViewHolder) {
             final Entry entry = mEntryList.get(position);
-            EntryViewHolder viewHolder = (EntryViewHolder) holder;
+            final EntryViewHolder viewHolder = (EntryViewHolder) holder;
             viewHolder.entryTitle.setText(entry.getTitle());
             viewHolder.entrySource.setText(entry.getSourceName());
             viewHolder.entryTime.setText(entry.geLocalPubTime());
+
+            if (entry.getSim_count() > 0) {
+                viewHolder.entryMore.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Intent intent = new Intent(context, FullCoverageActivity.class);
+                        intent.putExtra("cluster", entry.getCluster());
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        context.startActivity(intent);
+                    }
+                });
+            } else {
+                viewHolder.entryMore.setVisibility(View.GONE);
+            }
+
+//            final PopupMenu popupMenu = new PopupMenu(viewHolder.entryOption.getContext(), viewHolder.entryOption);
+
+            viewHolder.entryOption.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                    final Menu menu = viewHolder.popupMenu.getMenu();
+                    Log.d(TAG, "onClick: EntryOptionMenu: " + menu.findItem(R.id.star));
+//                    menu.findItem(R.id.star).setTitle("Unstar");
+
+                    GetStarRelationTask getStarRelationTask = new GetStarRelationTask(menu.findItem(R.id.star));
+                    getStarRelationTask.executeOnExecutor(Executors.newCachedThreadPool(), String.valueOf(entry.getId()));
+                    viewHolder.popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.star:
+                                    if (item.getTitle() == "Star") {
+                                        StarTask starTask = new StarTask(menu.findItem(R.id.star));
+                                        starTask.executeOnExecutor(Executors.newCachedThreadPool(), String.valueOf(entry.getId()));
+                                    } else if (item.getTitle() == "Unstar") {
+                                        UnstarTask unstarTask = new UnstarTask(menu.findItem(R.id.star));
+                                        unstarTask.executeOnExecutor(Executors.newCachedThreadPool(), String.valueOf(entry.getId()));
+                                    }
+                                    return true;
+                                case R.id.go_source:
+                                    Intent intent = new Intent(context, SourceActivity.class);
+                                    intent.putExtra("source_id", entry.getSourceId());
+                                    intent.putExtra("source_name", entry.getSourceName());
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    context.startActivity(intent);
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+                    viewHolder.popupMenu.show();
+
+
+                }
+            });
+
+
             if (entry.getDigest() == null || entry.getDigest().length() > 0) {
                 viewHolder.entryDigest.setText(entry.getDigest());
             } else {
@@ -490,6 +567,147 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         SharedPreferences sp = context.getSharedPreferences("SourcePhotoUrl", MODE_PRIVATE);
         String result = sp.getString(source_id, "NULL");
         return result;
+    }
+
+    class GetStarRelationTask extends AsyncTask<String, Void, Boolean> {
+        private MenuItem menuItem;
+        String entry_id;
+        public GetStarRelationTask(MenuItem menuItem) {
+            this.menuItem = menuItem;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            entry_id = params[0];
+            try {
+                OkHttpClient client = new OkHttpClient();
+
+
+                Request request = new Request.Builder()
+                        .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/isstarring")
+                        .addHeader("user_id", user.getId())
+                        .addHeader("entry_id", entry_id)
+                        .build();
+                Log.d(TAG, "doInBackground: GetStarsActivity: " + entry_id);
+                Response response = client.newCall(request).execute();
+                String responseData = response.body().string();
+                Log.d(TAG, "doInBackground: IsStarring: " + responseData);
+                if (responseData.equals("true")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            Log.d(TAG, "onPostExecute: MenuItemTitle: " + menuItem.getTitle());
+            if (result) {
+                menuItem.setTitle("Unstar");
+            } else {
+                menuItem.setTitle("Star");
+            }
+
+        }
+    }
+
+    class StarTask extends AsyncTask<String, Void, Boolean> {
+        private MenuItem menuItem;
+        String entry_id;
+        public StarTask(MenuItem menuItem) {
+            this.menuItem = menuItem;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            entry_id = params[0];
+            try {
+                OkHttpClient client = new OkHttpClient();
+
+
+                Request request = new Request.Builder()
+                        .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/star")
+                        .addHeader("user_id", user.getId())
+                        .addHeader("entry_id", entry_id)
+                        .build();
+                Response response = client.newCall(request).execute();
+                String responseData = response.body().string();
+                Log.d(TAG, "doInBackground: star: " + responseData);
+                if (responseData.equals("SUCCESS")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (result) {
+                menuItem.setTitle("Unstar");
+                Toast.makeText(context, "Starred", Toast.LENGTH_LONG).show();
+            } else {
+                menuItem.setTitle("Star");
+                Toast.makeText(context, "Failed to star it", Toast.LENGTH_LONG).show();
+            }
+
+        }
+    }
+
+    class UnstarTask extends AsyncTask<String, Void, Boolean> {
+        private MenuItem menuItem;
+        String entry_id;
+        public UnstarTask(MenuItem menuItem) {
+            this.menuItem = menuItem;
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            entry_id = params[0];
+            try {
+                OkHttpClient client = new OkHttpClient();
+
+
+                Request request = new Request.Builder()
+                        .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/unstar")
+                        .addHeader("user_id", user.getId())
+                        .addHeader("entry_id", entry_id)
+                        .build();
+                Response response = client.newCall(request).execute();
+                String responseData = response.body().string();
+                Log.d(TAG, "doInBackground: unstar: " + responseData);
+                if (responseData.equals("SUCCESS")) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return false;
+        }
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            super.onPostExecute(result);
+            if (result) {
+                menuItem.setTitle("Star");
+                Toast.makeText(context, "Unstarred", Toast.LENGTH_LONG).show();
+            } else {
+                menuItem.setTitle("Unstar");
+                Toast.makeText(context, "Failed to unstar it", Toast.LENGTH_LONG).show();
+            }
+
+        }
     }
 
     class GetSourcePhotoTask extends AsyncTask<String, Void, String> {

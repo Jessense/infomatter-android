@@ -21,6 +21,8 @@ public class Entry {
     private String source_name;
     private String photo; //封面图片链接
     private String content;
+    private int sim_count;
+    private int cluster;
 
     public Entry(int id, String title, String link, String time) {
         this.title = title;
@@ -58,6 +60,14 @@ public class Entry {
 
     public String getDigest() {
         return digest;
+    }
+
+    public int getCluster() {
+        return cluster;
+    }
+
+    public int getSim_count() {
+        return sim_count;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -164,5 +174,13 @@ public class Entry {
 
     public void setDigest(String digest) {
         this.digest = digest;
+    }
+
+    public void setCluster(int cluster) {
+        this.cluster = cluster;
+    }
+
+    public void setSim_count(int sim_count) {
+        this.sim_count = sim_count;
     }
 }
