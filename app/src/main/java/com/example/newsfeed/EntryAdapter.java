@@ -34,6 +34,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.lzy.ninegrid.ImageInfo;
 import com.lzy.ninegrid.NineGridView;
 import com.lzy.ninegrid.preview.NineGridViewClickAdapter;
@@ -335,6 +336,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 @Override
                 public void onClick(View view) {
                     String url = entry.getLink();
+                    markAsRead(String.valueOf(entry.getId()));
                     PackageManager pm = context.getPackageManager();
                     boolean isChromeInstalled = isPackageInstalled("com.android.chrome", pm);
                     if (isChromeInstalled) {
@@ -749,5 +751,25 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         .into(sourcePhoto);
             }
         }
+    }
+
+    //获取Entry列表
+    private void markAsRead(final String entry_id) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    OkHttpClient client = new OkHttpClient();
+                    Request request = new Request.Builder()
+                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/read")
+                            .addHeader("user_id", user.getId())
+                            .addHeader("entry_id", entry_id)
+                            .build();
+                    client.newCall(request).execute();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 }

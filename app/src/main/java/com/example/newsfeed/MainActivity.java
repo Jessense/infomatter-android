@@ -22,6 +22,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int last_id = 1000000;
     private String last_time = "9999-12-31 23:59:59";
     private int batch_size = 15;
+    private NavigationView navigationView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         drawer.addDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
         NineGridView.setImageLoader(new PicassoImageLoader());
@@ -94,6 +96,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             Log.d("MainActivity", "onCreate: After Login");
             Log.d("MainActivity", "onCreate: "+user.getName());
         } else { //如果用户已登录，则进入主页显示时间线
+            View navHeader = navigationView.getHeaderView(0);
+            TextView userName = navHeader.findViewById(R.id.user_name);
+            userName.setText(user.getName());
+
             recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
             recyclerView.setHasFixedSize(true);
             final LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -191,6 +197,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     user.setPassword(data.getStringExtra("password"));
                     user.setId(data.getStringExtra("id"));
                     user.setLogined(true);
+
+                    View navHeader = navigationView.getHeaderView(0);
+                    TextView userName = navHeader.findViewById(R.id.user_name);
+                    userName.setText(user.getName());
+
                     Log.d("MainActivity", "name: "+user.getName()+",id:"+user.getId() + user.getLogined().toString());
                     recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
                     recyclerView.setHasFixedSize(true);
