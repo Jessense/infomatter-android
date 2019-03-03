@@ -343,6 +343,13 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
         return result;
     }
 
+    public void updateList(List<Source> sources) {
+        if (sources != null) {
+            mSourceList.addAll(sources);
+        }
+        notifyDataSetChanged();
+    }
+
 
     @Override
     public int getItemCount() {
