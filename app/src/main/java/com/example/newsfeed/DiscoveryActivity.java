@@ -57,6 +57,7 @@ public class DiscoveryActivity extends AppCompatActivity {
         getSupportActionBar().setTitle("Discovery");
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.tab_viewpager);
+        viewPager.setOffscreenPageLimit(15);
         MyViewPagerAdapter viewPagerAdapter = new MyViewPagerAdapter(getSupportFragmentManager());
 //        viewPagerAdapter.addFragment(TabFragment.newInstance("0"), "推荐");
         viewPagerAdapter.addFragment(TabFragment.newInstance("1"), "科技");

@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
                     if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        if (lastVisibleItem == adapter.getItemCount() - 1) {
+                        if (adapter.isHasMore() == true && lastVisibleItem == adapter.getItemCount() - 1) {
                             last_time = adapter.getLastTime();
                             last_id = adapter.getLastId();
                             DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;

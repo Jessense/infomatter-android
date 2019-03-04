@@ -68,8 +68,8 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private final int ENTRY_WEIBO = 3;
     private final int FOOT_VIEW = 4;
 
-    private final boolean hasMore = true;
-    private final boolean fadeTips = false;
+    private boolean hasMore = true; //是否有更多数据
+    private final boolean fadeTips = false; //是否隐藏底部的提升
 
     private List<Entry> mEntryList;
     private Context context;
@@ -193,11 +193,12 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     class FootHolder extends RecyclerView.ViewHolder {
-        private ProgressBar progressBar;
-
+//        private ProgressBar progressBar;
+            private TextView tips;
         public FootHolder(View itemView) {
             super(itemView);
-            progressBar = itemView.findViewById(R.id.progressBar1);
+//            progressBar = itemView.findViewById(R.id.progressBar1);
+            tips = (TextView) itemView.findViewById(R.id.tips);
         }
     }
 
@@ -252,7 +253,18 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
         if (holder instanceof  FootHolder) {
           FootHolder viewHolder = (FootHolder) holder;
-          viewHolder.progressBar.setIndeterminate(true);
+          if (position == getItemCount() - 1) {
+              viewHolder.tips.setVisibility(View.VISIBLE);
+              if (hasMore == true) {
+                  viewHolder.tips.setText("Loading more");
+              } else {
+                  viewHolder.tips.setText("No more data");
+              }
+          } else {
+              viewHolder.tips.setVisibility(View.GONE);
+          }
+
+//          viewHolder.progressBar.setIndeterminate(true);
         } else if (holder instanceof EntryViewHolder) {
             final Entry entry = mEntryList.get(position);
             final EntryViewHolder viewHolder = (EntryViewHolder) holder;
@@ -615,15 +627,27 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return mEntryList.size() + 1;
     }
 
+    public boolean isFadeTips() {
+        return fadeTips;
+    }
+
+    public boolean isHasMore() {
+        return hasMore;
+    }
+
     public void resetList() {
         mEntryList = new ArrayList<>();
     }
 
     public void updateList(List<Entry> newEntries) {
-        if (newEntries != null) {
+        if (newEntries != null && newEntries.size() > 0) {
             mEntryList.addAll(newEntries);
+        } else {
+            this.hasMore = false;
         }
+        notifyItemRemoved(getItemCount()-1);
         notifyDataSetChanged();
+        Log.d(TAG, "updateList: updated");
     }
 
     public int getLastId() {
