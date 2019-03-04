@@ -75,12 +75,53 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private Context context;
     private Config config;
     private User user;
+    private Transformation transformation;
 
     public EntryAdapter (List<Entry> entryList, Context context) {
         this.mEntryList = entryList;
         this.context = context;
         this.config = new Config();
         this.user = new User(context);
+        this.transformation = new Transformation() {
+
+            @Override
+            public Bitmap transform(Bitmap source) {
+
+                int targetWidth = 1200;
+//                    LogCat.i("source.getHeight()="+source.getHeight()+",source.getWidth()="+source.getWidth()+",targetWidth="+targetWidth);
+
+                if(source.getWidth()==0){
+                    return source;
+                }
+
+                //如果图片小于设置的宽度，则返回原图
+                if(source.getWidth()<targetWidth){
+                    return source;
+                }else{
+                    //如果图片大小大于等于设置的宽度，则按照设置的宽度比例来缩放
+                    double aspectRatio = (double) source.getHeight() / (double) source.getWidth();
+                    int targetHeight = (int) (targetWidth * aspectRatio);
+                    if (targetHeight != 0 && targetWidth != 0) {
+                        Bitmap result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false);
+                        if (result != source) {
+                            // Same bitmap is returned if sizes are the same
+                            source.recycle();
+                        }
+                        return result;
+                    } else {
+                        return source;
+                    }
+                }
+
+            }
+
+            @Override
+            public String key() {
+                return "transformation" + " desiredWidth";
+            }
+        };
+
+
     }
 
 
@@ -131,14 +172,23 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         private TextView entrySource;
         private TextView entryTime;
         private CardView entryCard;
+        private ImageView sourcePhoto;
         private NineGridView nineGridView;
+        private ImageView entryOption;
+        private PopupMenu popupMenu;
+        private ImageView entryMore;
         private EntryViewHolderWeibo(View view) {
             super(view);
             entryContent = (TextView) view.findViewById(R.id.entry_content);
+            sourcePhoto = (ImageView) view.findViewById(R.id.source_photo);
             entrySource = (TextView) view.findViewById(R.id.entry_source);
             entryTime = (TextView) view.findViewById(R.id.entry_time);
             entryCard = (CardView) view.findViewById(R.id.entry_card_weibo);
             nineGridView = (NineGridView) view.findViewById(R.id.nineGrid);
+            entryOption = (ImageView) view.findViewById(R.id.entry_option);
+            entryMore = (ImageView) view.findViewById(R.id.entry_cluster);
+            popupMenu = new PopupMenu(entryOption.getContext(), entryOption);
+            popupMenu.inflate(R.menu.entry_option);
         }
     }
 
@@ -158,7 +208,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public int getItemViewType(int position) {
         if (position == getItemCount() - 1) {
             return FOOT_VIEW;
-        } else if (mEntryList.get(position).getLink().indexOf("weibo.com") != -1 || mEntryList.get(position).getLink().indexOf("weibo.cn") != -1) {
+        } else if (isWeibo(mEntryList.get(position).getLink())) {
             return ENTRY_WEIBO;
         } else if (mEntryList.get(position).getPhoto() == null || mEntryList.get(position).getPhoto().equals("")
                 || mEntryList.get(position).getSourceId().equals("19") || mEntryList.get(position).getSourceId().equals("15")) { //无封面图的文章
@@ -206,7 +256,13 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else if (holder instanceof EntryViewHolder) {
             final Entry entry = mEntryList.get(position);
             final EntryViewHolder viewHolder = (EntryViewHolder) holder;
-            viewHolder.entryTitle.setText(entry.getTitle());
+            if (isWeibo(entry.getLink())) {
+                viewHolder.entryTitle.setVisibility(View.GONE);
+                viewHolder.entryDigest.setMaxLines(5);
+            } else {
+                viewHolder.entryTitle.setText(entry.getTitle());
+            }
+
             viewHolder.entrySource.setText(entry.getSourceName());
             viewHolder.entryTime.setText(entry.geLocalPubTime());
 
@@ -274,47 +330,9 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             } else {
                 viewHolder.entryDigest.setText(Html2Text(entry.getContent()));
             }
-            Transformation transformation = new Transformation() {
-
-                @Override
-                public Bitmap transform(Bitmap source) {
-
-                    int targetWidth = 1200;
-//                    LogCat.i("source.getHeight()="+source.getHeight()+",source.getWidth()="+source.getWidth()+",targetWidth="+targetWidth);
-
-                    if(source.getWidth()==0){
-                        return source;
-                    }
-
-                    //如果图片小于设置的宽度，则返回原图
-                    if(source.getWidth()<targetWidth){
-                        return source;
-                    }else{
-                        //如果图片大小大于等于设置的宽度，则按照设置的宽度比例来缩放
-                        double aspectRatio = (double) source.getHeight() / (double) source.getWidth();
-                        int targetHeight = (int) (targetWidth * aspectRatio);
-                        if (targetHeight != 0 && targetWidth != 0) {
-                            Bitmap result = Bitmap.createScaledBitmap(source, targetWidth, targetHeight, false);
-                            if (result != source) {
-                                // Same bitmap is returned if sizes are the same
-                                source.recycle();
-                            }
-                            return result;
-                        } else {
-                            return source;
-                        }
-                    }
-
-                }
-
-                @Override
-                public String key() {
-                    return "transformation" + " desiredWidth";
-                }
-            };
 
             if (getStoredPhotoUrl(String.valueOf(entry.getSourceId())) == "NULL") {
-                GetSourcePhotoTask getSourcePhotoTask = new GetSourcePhotoTask(viewHolder.entryPhoto);
+                GetSourcePhotoTask getSourcePhotoTask = new GetSourcePhotoTask(viewHolder.sourcePhoto);
                 getSourcePhotoTask.executeOnExecutor(Executors.newCachedThreadPool(), entry.getSourceId());
             } else {
                 Picasso.get()
@@ -402,7 +420,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             });
         } else if (holder instanceof EntryViewHolderWeibo){
             final Entry entry = mEntryList.get(position);
-            EntryViewHolderWeibo viewHolder = (EntryViewHolderWeibo) holder;
+            final EntryViewHolderWeibo viewHolder = (EntryViewHolderWeibo) holder;
 //            Pattern pattern = Pattern.compile("<img.+?><br><br>");
 //            Matcher matcher = pattern.matcher(entry.getContent());
 //            String result = matcher.replaceAll("");
@@ -414,6 +432,60 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 //            viewHolder.entryContent.setText(Html.fromHtml(entry.getContent()));
             viewHolder.entrySource.setText(entry.getSourceName());
             viewHolder.entryTime.setText(entry.geLocalPubTime());
+            viewHolder.entryMore.setVisibility(View.GONE);
+
+
+            viewHolder.entryOption.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+
+                    final Menu menu = viewHolder.popupMenu.getMenu();
+                    Log.d(TAG, "onClick: EntryOptionMenu: " + menu.findItem(R.id.star));
+//                    menu.findItem(R.id.star).setTitle("Unstar");
+
+                    GetStarRelationTask getStarRelationTask = new GetStarRelationTask(menu.findItem(R.id.star));
+                    getStarRelationTask.executeOnExecutor(Executors.newCachedThreadPool(), String.valueOf(entry.getId()));
+                    viewHolder.popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.star:
+                                    if (item.getTitle() == "Star") {
+                                        StarTask starTask = new StarTask(menu.findItem(R.id.star));
+                                        starTask.executeOnExecutor(Executors.newCachedThreadPool(), String.valueOf(entry.getId()));
+                                    } else if (item.getTitle() == "Unstar") {
+                                        UnstarTask unstarTask = new UnstarTask(menu.findItem(R.id.star));
+                                        unstarTask.executeOnExecutor(Executors.newCachedThreadPool(), String.valueOf(entry.getId()));
+                                    }
+                                    return true;
+                                case R.id.go_source:
+                                    Intent intent = new Intent(context, SourceActivity.class);
+                                    intent.putExtra("source_id", entry.getSourceId());
+                                    intent.putExtra("source_name", entry.getSourceName());
+                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                    context.startActivity(intent);
+                                    return true;
+                                default:
+                                    return false;
+                            }
+                        }
+                    });
+                    viewHolder.popupMenu.show();
+
+
+                }
+            });
+
+
+            if (getStoredPhotoUrl(String.valueOf(entry.getSourceId())) == "NULL") {
+                GetSourcePhotoTask getSourcePhotoTask = new GetSourcePhotoTask(viewHolder.sourcePhoto);
+                getSourcePhotoTask.executeOnExecutor(Executors.newCachedThreadPool(), entry.getSourceId());
+            } else {
+                Picasso.get()
+                        .load(getStoredPhotoUrl(String.valueOf(entry.getSourceId())))
+                        .into(viewHolder.sourcePhoto);
+            }
 
 
             ArrayList<ImageInfo> imageInfo = new ArrayList<>();
@@ -493,6 +565,11 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return list;
     }
 
+    public boolean isWeibo(String link) {
+        if (link.indexOf("weibo.com") != -1 || link.indexOf("weibo.cn") != -1 || link.indexOf("fanfou.com") != -1)
+            return true;
+        return false;
+    }
 
     public static String Html2Text(String inputString){
         String htmlStr = inputString; //含html标签的字符串

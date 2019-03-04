@@ -2,6 +2,10 @@ package com.example.newsfeed;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.text.TextUtils;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import static android.content.Context.MODE_PRIVATE;
 
@@ -92,4 +96,6 @@ public class User {
         editor.putString("logined",logined.toString());
         editor.commit();
     }
+
+
 }

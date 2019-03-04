@@ -3,6 +3,7 @@ package com.example.newsfeed;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -10,6 +11,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import org.json.JSONObject;
+
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
@@ -74,7 +78,7 @@ public class LoginActivity extends AppCompatActivity {
         //建立请求表单，添加上传服务器的参数
         RequestBody formBody = new FormBody.Builder()
                 .add("name",name)
-                .add("password",password)
+                .add("password",md5(password))
                 .build();
         //发起请求
         final Request request = new Request.Builder()
@@ -94,10 +98,10 @@ public class LoginActivity extends AppCompatActivity {
                     if (responseData != "NOTFOUND") {
                         JSONObject jsonObject = new JSONObject(responseData);
                         Log.d("LoginActivity", "name: "+jsonObject.getString("name") + ",password:"+jsonObject.getString("password"));
-                        if (name.equals(jsonObject.getString("name")) && password.equals(jsonObject.getString("password"))) {
+                        if (name.equals(jsonObject.getString("name")) && md5(password).equals(jsonObject.getString("password"))) {
                             Intent intent = new Intent();
                             intent.putExtra("name", name);
-                            intent.putExtra("password", password);
+                            intent.putExtra("password", md5(password));
                             intent.putExtra("id", jsonObject.getString("id"));
                             Log.d("Login Activity", "run: Login success");
                             showToast("Login Successful");
@@ -129,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
         //建立请求表单，添加上传服务器的参数
         RequestBody formBody = new FormBody.Builder()
                 .add("name",name)
-                .add("password",password)
+                .add("password",md5(password))
                 .build();
         //发起请求
         final Request request = new Request.Builder()
@@ -149,10 +153,10 @@ public class LoginActivity extends AppCompatActivity {
                     if (responseData != "FAILURE" && responseData != "EXISTED") {
                         JSONObject jsonObject = new JSONObject(responseData);
                         Log.d("LoginActivity", "name: "+jsonObject.getString("name") + ",password:"+jsonObject.getString("password"));
-                        if (name.equals(jsonObject.getString("name")) && password.equals(jsonObject.getString("password"))) {
+                        if (name.equals(jsonObject.getString("name")) && md5(password).equals(jsonObject.getString("password"))) {
                             Intent intent = new Intent();
                             intent.putExtra("name", name);
-                            intent.putExtra("password", password);
+                            intent.putExtra("password", md5(password));
                             intent.putExtra("id", jsonObject.getString("id"));
                             Log.d("Login Activity", "run: Login SUCCESS");
                             showToast("Register Successful");
@@ -187,5 +191,34 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, toastText, Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    public static String md5(String string)
+    {
+        if (TextUtils.isEmpty(string))
+        {
+            return "";
+        }
+        MessageDigest md5 = null;
+        try
+        {
+            md5 = MessageDigest.getInstance("MD5");
+            byte[] bytes = md5.digest(string.getBytes());
+            String result = "";
+            for (byte b : bytes)
+            {
+                String temp = Integer.toHexString(b & 0xff);
+                if (temp.length() == 1)
+                {
+                    temp = "0" + temp;
+                }
+                result += temp;
+            }
+            return result;
+        } catch (NoSuchAlgorithmException e)
+        {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

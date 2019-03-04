@@ -61,16 +61,17 @@ public class DiscoveryActivity extends AppCompatActivity {
 //        viewPagerAdapter.addFragment(TabFragment.newInstance("0"), "推荐");
         viewPagerAdapter.addFragment(TabFragment.newInstance("1"), "科技");
         viewPagerAdapter.addFragment(TabFragment.newInstance("2"), "技术");
-        viewPagerAdapter.addFragment(TabFragment.newInstance("3"), "财经");
-        viewPagerAdapter.addFragment(TabFragment.newInstance("4"), "公众号");
-        viewPagerAdapter.addFragment(TabFragment.newInstance("5"), "好奇心");
         viewPagerAdapter.addFragment(TabFragment.newInstance("9"), "大学");
+        viewPagerAdapter.addFragment(TabFragment.newInstance("3"), "财经");
+        viewPagerAdapter.addFragment(TabFragment.newInstance("5"), "好奇心");
+        viewPagerAdapter.addFragment(TabFragment.newInstance("4"), "公众号");
+        viewPagerAdapter.addFragment(TabFragment.newInstance("E"), "社交媒体");
         viewPagerAdapter.addFragment(TabFragment.newInstance("6"), "美");
+        viewPagerAdapter.addFragment(TabFragment.newInstance("C"), "生活");
         viewPagerAdapter.addFragment(TabFragment.newInstance("7"), "娱乐");
         viewPagerAdapter.addFragment(TabFragment.newInstance("A"), "体育");
-        viewPagerAdapter.addFragment(TabFragment.newInstance("B"), "生活");
-        viewPagerAdapter.addFragment(TabFragment.newInstance("C"), "搞笑");
-        viewPagerAdapter.addFragment(TabFragment.newInstance("D"), "其他");
+        viewPagerAdapter.addFragment(TabFragment.newInstance("B"), "搞笑");
+        viewPagerAdapter.addFragment(TabFragment.newInstance("Z"), "其他");
 
         viewPager.setAdapter(viewPagerAdapter);
 
@@ -79,14 +80,15 @@ public class DiscoveryActivity extends AppCompatActivity {
 //        tabLayout.addTab(tabLayout.newTab().setText("推荐"));
         tabLayout.addTab(tabLayout.newTab().setText("科技"));
         tabLayout.addTab(tabLayout.newTab().setText("技术"));
-        tabLayout.addTab(tabLayout.newTab().setText("财经"));
-        tabLayout.addTab(tabLayout.newTab().setText("公众号"));
-        tabLayout.addTab(tabLayout.newTab().setText("好奇心"));
         tabLayout.addTab(tabLayout.newTab().setText("大学"));
+        tabLayout.addTab(tabLayout.newTab().setText("财经"));
+        tabLayout.addTab(tabLayout.newTab().setText("好奇心"));
+        tabLayout.addTab(tabLayout.newTab().setText("公众号"));
+        tabLayout.addTab(tabLayout.newTab().setText("社交媒体"));
         tabLayout.addTab(tabLayout.newTab().setText("美"));
+        tabLayout.addTab(tabLayout.newTab().setText("生活"));
         tabLayout.addTab(tabLayout.newTab().setText("娱乐"));
         tabLayout.addTab(tabLayout.newTab().setText("体育"));
-        tabLayout.addTab(tabLayout.newTab().setText("生活"));
         tabLayout.addTab(tabLayout.newTab().setText("搞笑"));
         tabLayout.addTab(tabLayout.newTab().setText("其他"));
 

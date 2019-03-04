@@ -105,7 +105,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
             }
         });
 
-        if (source.getPhoto().length() > 0) {
+        if (source.getPhoto() != null && source.getPhoto().length() > 0) {
             storeSourcePhoto(source.getId(), source.getPhoto());
             Picasso.get()
                     .load(source.getPhoto())
