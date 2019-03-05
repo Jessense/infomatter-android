@@ -7,4 +7,6 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
     <string name="search_hint">input source or rss</string>
+    <string name="feedback_hint">如果您有想看的内容源，发现的产品bug，对于产品的建议，请发送邮件至</string>
+    <string name="support_email">support@infomatter.cn</string>
 </resources>

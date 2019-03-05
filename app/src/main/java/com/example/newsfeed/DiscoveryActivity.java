@@ -59,7 +59,7 @@ public class DiscoveryActivity extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.tab_viewpager);
         viewPager.setOffscreenPageLimit(15);
         MyViewPagerAdapter viewPagerAdapter = new MyViewPagerAdapter(getSupportFragmentManager());
-//        viewPagerAdapter.addFragment(TabFragment.newInstance("0"), "推荐");
+        viewPagerAdapter.addFragment(TabFragment.newInstance("0"), "推荐");
         viewPagerAdapter.addFragment(TabFragment.newInstance("1"), "科技");
         viewPagerAdapter.addFragment(TabFragment.newInstance("2"), "技术");
         viewPagerAdapter.addFragment(TabFragment.newInstance("9"), "大学");
@@ -78,7 +78,7 @@ public class DiscoveryActivity extends AppCompatActivity {
 
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tablayout);
-//        tabLayout.addTab(tabLayout.newTab().setText("推荐"));
+        tabLayout.addTab(tabLayout.newTab().setText("推荐"));
         tabLayout.addTab(tabLayout.newTab().setText("科技"));
         tabLayout.addTab(tabLayout.newTab().setText("技术"));
         tabLayout.addTab(tabLayout.newTab().setText("大学"));

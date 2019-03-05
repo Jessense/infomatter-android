@@ -23,6 +23,7 @@ public class Entry {
     private String content;
     private int sim_count;
     private int cluster;
+    private int star_id;
 
     public Entry(int id, String title, String link, String time) {
         this.title = title;
@@ -68,6 +69,10 @@ public class Entry {
 
     public int getSim_count() {
         return sim_count;
+    }
+
+    public int getStar_id() {
+        return star_id;
     }
 
     @RequiresApi(api = Build.VERSION_CODES.O)
@@ -182,5 +187,9 @@ public class Entry {
 
     public void setSim_count(int sim_count) {
         this.sim_count = sim_count;
+    }
+
+    public void setStar_id(int star_id) {
+        this.star_id = star_id;
     }
 }

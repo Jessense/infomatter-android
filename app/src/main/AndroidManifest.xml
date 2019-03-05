@@ -39,7 +39,9 @@
         <activity
             android:name=".StarsActivity"
             android:parentActivityName=".MainActivity" />
-        <activity android:name=".FullCoverageActivity"></activity>
+        <activity android:name=".FullCoverageActivity" />
+        <activity android:name=".FeedbackActivity" />
+        <activity android:name=".SettingActivity" />
     </application>
 
 </manifest>

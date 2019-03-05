@@ -369,11 +369,18 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     markAsRead(String.valueOf(entry.getId()));
                     PackageManager pm = context.getPackageManager();
                     boolean isChromeInstalled = isPackageInstalled("com.android.chrome", pm);
-                    if (isChromeInstalled) {
+                    if (entry.getContent().length() > entry.getDigest().length()) {
+                        Intent intent = new Intent(view.getContext(), WebviewActivity.class);
+                        intent.putExtra("html",entry.getContent());
+                        intent.putExtra("title", entry.getTitle());
+                        intent.putExtra("source_name", entry.getSourceName());
+                        intent.putExtra("time", entry.geLocalPubTime());
+                        view.getContext().startActivity(intent);
+                    } else if (isChromeInstalled) {
                         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_share);
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.setType("text/plain");
-                        intent.putExtra(Intent.EXTRA_TEXT, entry.getLink());
+                        intent.putExtra(Intent.EXTRA_TEXT, entry.getTitle() + "\n" + entry.getLink());
                         intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
                         int requestCode = 100;
 
@@ -388,7 +395,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         customTabsIntent.launchUrl(view.getContext(), Uri.parse(url));
                     } else {
                         Intent intent = new Intent(view.getContext(), WebviewActivity.class);
-                        intent.putExtra("extra_data",url);
+                        intent.putExtra("url",url);
                         view.getContext().startActivity(intent);
                     }
                 }
@@ -410,7 +417,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_share);
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.setType("text/plain");
-                        intent.putExtra(Intent.EXTRA_TEXT, entry.getLink());
+                        intent.putExtra(Intent.EXTRA_TEXT, entry.getTitle() + "\n" + entry.getLink());
                         intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
                         int requestCode = 100;
 
@@ -425,7 +432,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         customTabsIntent.launchUrl(view.getContext(), Uri.parse(url));
                     } else {
                         Intent intent = new Intent(view.getContext(), WebviewActivity.class);
-                        intent.putExtra("extra_data",url);
+                        intent.putExtra("url",url);
                         view.getContext().startActivity(intent);
                     }
                 }
@@ -524,7 +531,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.ic_action_share);
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.setType("text/plain");
-                        intent.putExtra(Intent.EXTRA_TEXT, entry.getLink());
+                        intent.putExtra(Intent.EXTRA_TEXT, entry.getTitle() + "\n" + entry.getLink());
                         intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
                         int requestCode = 100;
 
@@ -539,7 +546,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         customTabsIntent.launchUrl(view.getContext(), Uri.parse(url));
                     } else {
                         Intent intent = new Intent(view.getContext(), WebviewActivity.class);
-                        intent.putExtra("extra_data",url);
+                        intent.putExtra("url",url);
                         view.getContext().startActivity(intent);
                     }
                 }
@@ -567,7 +574,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 Matcher m_src = p_src.matcher(str_img);
                 if (m_src.find()) {
                     String str_src = m_src.group(3);
-                    if (str_src.endsWith(".jpg"))
+                    if (str_src.endsWith(".jpg") || str_src.endsWith(".gif"))
                         list.add(str_src);
                 }
                 //匹配content中是否存在下一个<img />标签，有则继续以上步骤匹配<img />标签中的src
@@ -652,6 +659,10 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public int getLastId() {
         return mEntryList.get(mEntryList.size()-1).getId();
+    }
+
+    public int getLastStarId() {
+        return mEntryList.get(mEntryList.size()-1).getStar_id();
     }
 
     public String getLastTime() {

@@ -109,27 +109,26 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
-                    if (newState == RecyclerView.SCROLL_STATE_IDLE) {
-                        if (adapter.isHasMore() == true && lastVisibleItem == adapter.getItemCount() - 1) {
-                            last_time = adapter.getLastTime();
-                            last_id = adapter.getLastId();
-                            DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
-                            TemporalAccessor accessor = timeFormatter.parse(last_time);
-                            Date pubDate = Date.from(Instant.from(accessor));
-                            LocalDateTime localPubDate = pubDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
-                            String temp = localPubDate.toString();
-                            last_time = temp.substring(0, 10) + " " + temp.substring(11, 16);
-                            if (temp.length() < 19) {
-                                last_time += ":00";
-                            } else {
-                                last_time += temp.substring(16, 19);
-                            }
-                            Log.d("MainActivity", "onScrollStateChanged: localPubDate" + localPubDate);
-                            Log.d("MainActivity", "onScrollStateChanged: last_time=" + last_time);
-                            Log.d("MainActivity", "onScrollStateChanged: last_id=" + last_id);
-                            getEntryList();
+                    if (adapter.isHasMore() == true && ((lastVisibleItem == adapter.getItemCount() - 5) || (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem == adapter.getItemCount() - 1))) {
+                        last_time = adapter.getLastTime();
+                        last_id = adapter.getLastId();
+                        DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
+                        TemporalAccessor accessor = timeFormatter.parse(last_time);
+                        Date pubDate = Date.from(Instant.from(accessor));
+                        LocalDateTime localPubDate = pubDate.toInstant().atZone(ZoneId.systemDefault()).toLocalDateTime();
+                        String temp = localPubDate.toString();
+                        last_time = temp.substring(0, 10) + " " + temp.substring(11, 16);
+                        if (temp.length() < 19) {
+                            last_time += ":00";
+                        } else {
+                            last_time += temp.substring(16, 19);
                         }
+                        Log.d("MainActivity", "onScrollStateChanged: localPubDate" + localPubDate);
+                        Log.d("MainActivity", "onScrollStateChanged: last_time=" + last_time);
+                        Log.d("MainActivity", "onScrollStateChanged: last_id=" + last_id);
+                        getEntryList();
                     }
+
                 }
 
                 @Override
@@ -333,10 +332,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(intent);
 
         } else if (id == R.id.nav_feedback) {
-            Toast.makeText(MainActivity.this, "敬请期待~", Toast.LENGTH_LONG).show();
-
+            Intent inent = new Intent(MainActivity.this, FeedbackActivity.class);
+            startActivity(inent);
         } else if (id == R.id.nav_settings) {
-            Toast.makeText(MainActivity.this, "敬请期待~", Toast.LENGTH_LONG).show();
+            Intent inent = new Intent(MainActivity.this, SettingActivity.class);
+            startActivity(inent);
         } else if (id == R.id.nav_logout) {
             user.setLogined(false);
             finish();

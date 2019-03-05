@@ -53,9 +53,14 @@ public class LoginActivity extends AppCompatActivity {
 
                 name=ed1.getText().toString().trim();
                 password=ed2.getText().toString().trim();
-                Log.d("LoginActivity", "ed1: "+name);
-                //通过okhttp发起post请求
-                postLoginRequest(name,password);
+                if (name.length() >=3 && name.length() <= 16 && password.length() >= 6 && password.length() <= 16 ) {
+                    Log.d("LoginActivity", "ed1: "+name);
+                    //通过okhttp发起post请求
+                    postLoginRequest(name,password);
+                } else {
+                    showToast("require: name length 3~16 and password length 6~16");
+                }
+
             }
         });
 
@@ -65,9 +70,14 @@ public class LoginActivity extends AppCompatActivity {
 
                 name=ed1.getText().toString().trim();
                 password=ed2.getText().toString().trim();
-                Log.d("LoginActivity", "ed1: "+name);
-                //通过okhttp发起post请求
-                postRegisterRequest(name,password);
+                if (name.length() >=3 && name.length() <= 16 && password.length() >= 6 && password.length() <= 16 ) {
+                    Log.d("LoginActivity", "ed1: "+name);
+                    //通过okhttp发起post请求
+                    postRegisterRequest(name,password);
+                } else {
+                    showToast("require: name length 3~16 and password length 6~16");
+                }
+
             }
         });
 
