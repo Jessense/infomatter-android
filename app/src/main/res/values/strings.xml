@@ -9,4 +9,14 @@
     <string name="search_hint">input source or rss</string>
     <string name="feedback_hint">如果您有想看的内容源，发现的产品bug，对于产品的建议，请发送邮件至</string>
     <string name="support_email">support@infomatter.cn</string>
+    <string-array name="planets_array">
+        <item>Mercury</item>
+        <item>Venus</item>
+        <item>Earth</item>
+        <item>Mars</item>
+        <item>Jupiter</item>
+        <item>Saturn</item>
+        <item>Uranus</item>
+        <item>Neptune</item>
+    </string-array>
 </resources>

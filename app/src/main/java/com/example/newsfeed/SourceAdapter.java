@@ -7,8 +7,10 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.os.Message;
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -270,6 +272,12 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                     followbtn.setText("following");
                     followbtn.setTextColor(context.getResources().getColor(R.color.simplenoteBlue));
                     followbtn.setBackgroundResource(R.drawable.border_line_blue);
+                    ChooseGroupFragment chooseGroupFragment = new ChooseGroupFragment();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("source_id", source_id);
+                    chooseGroupFragment.setArguments(bundle);
+                    chooseGroupFragment.show(((AppCompatActivity) context).getSupportFragmentManager(), "ChooseGroup");
+
 
                 } else {
                     followbtn.setText("+ follow");

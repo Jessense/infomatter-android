@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -21,7 +22,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,12 +36,14 @@ import com.lzy.ninegrid.NineGridView;
 import com.lapism.searchview.widget.SearchView;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -54,6 +59,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Config config;
     private SwipeRefreshLayout swipeRefresh;
     private SearchView searchView;
+    private Menu menu;
+    private Spinner spinner;
+    private String[] groups_default;
     private int lastVisibleItem = 0;
     private int last_id = 1000000;
     private String last_time = "9999-12-31 23:59:59";
@@ -69,7 +77,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.my_toolbar);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Home");
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -83,6 +91,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         NineGridView.setImageLoader(new PicassoImageLoader());
 
         setSearchView();
+
+        groups_default = new String[] {"All", "Recommendation", "Popular"};
 
         swipeRefresh = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh);
         swipeRefresh.setColorSchemeResources(R.color.colorPrimary);
@@ -196,6 +206,17 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     user.setPassword(data.getStringExtra("password"));
                     user.setId(data.getStringExtra("id"));
                     user.setLogined(true);
+                    user.setGroups2(data.getStringExtra("groups2"));
+
+
+                    //update spinner
+                    List<String> list = new ArrayList(Arrays.asList(groups_default));
+                    list.addAll(Arrays.asList(user.getGroups2()));
+                    String[] groups = list.toArray(new String[0]);
+                    ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                            (this, android.R.layout.simple_spinner_item, groups);
+                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinner.setAdapter(adapter);
 
                     View navHeader = navigationView.getHeaderView(0);
                     TextView userName = navHeader.findViewById(R.id.user_name);
@@ -309,7 +330,37 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main,menu); //通过getMenuInflater()方法得到MenuInflater对象，再调用它的inflate()方法就可以给当前活动创建菜单了，第一个参数：用于指定我们通过哪一个资源文件来创建菜单；第二个参数：用于指定我们的菜单项将添加到哪一个Menu对象当中。
+        MenuItem item = menu.findItem(R.id.spinner);
+        spinner = (Spinner) MenuItemCompat.getActionView(item);
+
+        //update spinner
+        List<String> list = new ArrayList(Arrays.asList(groups_default));
+        list.addAll(Arrays.asList(user.getGroups2()));
+        String[] groups = list.toArray(new String[0]);
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, groups);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(adapter);
+
+        this.menu = menu;
         return true;
+    }
+
+    public void updateSpinner() {
+        getMenuInflater().inflate(R.menu.main,menu); //通过getMenuInflater()方法得到MenuInflater对象，再调用它的inflate()方法就可以给当前活动创建菜单了，第一个参数：用于指定我们通过哪一个资源文件来创建菜单；第二个参数：用于指定我们的菜单项将添加到哪一个Menu对象当中。
+        MenuItem item = menu.findItem(R.id.spinner);
+        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+
+
+        String[] groups_default = new String[] {"All", "Recommendation", "Popular"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, groups_default);
+
+//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+//                R.array.planets_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        spinner.setAdapter(adapter);
     }
 
 

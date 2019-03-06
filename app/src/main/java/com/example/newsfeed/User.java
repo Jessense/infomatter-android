@@ -2,11 +2,9 @@ package com.example.newsfeed;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.text.TextUtils;
+import android.util.Log;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
+import static android.content.ContentValues.TAG;
 import static android.content.Context.MODE_PRIVATE;
 
 public class User {
@@ -16,6 +14,7 @@ public class User {
     private String photo; //头像
     private String id;
     private Boolean logined; //是否已登录
+    private String groups2;
 
     public User(Context context) {
         this.mycontext = context;
@@ -56,6 +55,17 @@ public class User {
         return Boolean.parseBoolean(result);
     }
 
+    public String[] getGroups2() {
+        SharedPreferences sp = mycontext.getSharedPreferences("UserInfo", MODE_PRIVATE);
+        String result = sp.getString("groups2", "");
+        Log.d(TAG, "getGroups2: groups1: " + result);
+        String[] groups = result.split("\\$\\$");
+        Log.d(TAG, "getGroups2: groups2: " + groups);
+        groups[0] = groups[0].substring(1);
+        groups[groups.length - 1] = groups[groups.length - 1].substring(0, groups[groups.length - 1].length() - 1);
+        Log.d(TAG, "getGroups2: groups2: " + groups);
+        return groups;
+    }
 
     public void setName(String name) {
         SharedPreferences sp = mycontext.getSharedPreferences("UserInfo", MODE_PRIVATE);
@@ -97,5 +107,11 @@ public class User {
         editor.commit();
     }
 
-
+    public void setGroups2(String groups2) {
+        SharedPreferences sp = mycontext.getSharedPreferences("UserInfo", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("groups2","");    // 先清空原始数据
+        editor.putString("groups2",groups2.toString());
+        editor.commit();
+    }
 }
