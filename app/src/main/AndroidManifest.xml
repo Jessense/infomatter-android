@@ -42,6 +42,7 @@
         <activity android:name=".FullCoverageActivity" />
         <activity android:name=".FeedbackActivity" />
         <activity android:name=".SettingActivity" />
+        <activity android:name=".GroupActivity"></activity>
     </application>
 
 </manifest>

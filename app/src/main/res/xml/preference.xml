@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <Preference
+        android:title="Edit groups"
+        android:key="edit_groups"
+        android:summary="Add, delete and rename groups"/>
+    <Preference
         android:title="Help"
         android:key="help"
         android:summary="Questions frequently asked and tutorials"/>

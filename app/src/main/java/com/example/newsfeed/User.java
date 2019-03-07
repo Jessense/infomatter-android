@@ -60,10 +60,12 @@ public class User {
         String result = sp.getString("groups2", "");
         Log.d(TAG, "getGroups2: groups1: " + result);
         String[] groups = result.split("\\$\\$");
-        Log.d(TAG, "getGroups2: groups2: " + groups);
-        groups[0] = groups[0].substring(1);
-        groups[groups.length - 1] = groups[groups.length - 1].substring(0, groups[groups.length - 1].length() - 1);
-        Log.d(TAG, "getGroups2: groups2: " + groups);
+        if (groups[0].length() > 0) {
+            Log.d(TAG, "getGroups2: groups2: " + groups);
+            groups[0] = groups[0].substring(1);
+            groups[groups.length - 1] = groups[groups.length - 1].substring(0, groups[groups.length - 1].length() - 1);
+            Log.d(TAG, "getGroups2: groups2: " + groups);
+        }
         return groups;
     }
 
@@ -112,6 +114,36 @@ public class User {
         SharedPreferences.Editor editor = sp.edit();
         editor.putString("groups2","");    // 先清空原始数据
         editor.putString("groups2",groups2.toString());
+        editor.commit();
+    }
+
+    public void addGroups2(String new_group) {
+        SharedPreferences sp = mycontext.getSharedPreferences("UserInfo", MODE_PRIVATE);
+        String pre_groups = sp.getString("groups2", "");
+        String new_groups = pre_groups + "$" + new_group + "$";
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("groups2","");    // 先清空原始数据
+        editor.putString("groups2",new_groups.toString());
+        editor.commit();
+    }
+
+    public void editGroups2(String pre_group, String new_group) {
+        SharedPreferences sp = mycontext.getSharedPreferences("UserInfo", MODE_PRIVATE);
+        String pre_groups = sp.getString("groups2", "");
+        String new_groups = pre_groups.replace("$" + pre_group + "$", "$" + new_group +"$");
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("groups2","");    // 先清空原始数据
+        editor.putString("groups2",new_groups.toString());
+        editor.commit();
+    }
+
+    public void deleteGroups2(String pre_group) {
+        SharedPreferences sp = mycontext.getSharedPreferences("UserInfo", MODE_PRIVATE);
+        String pre_groups = sp.getString("groups2", "");
+        String new_groups = pre_groups.replace("$" + pre_group + "$", "");
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("groups2","");    // 先清空原始数据
+        editor.putString("groups2",new_groups.toString());
         editor.commit();
     }
 }

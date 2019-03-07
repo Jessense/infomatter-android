@@ -49,6 +49,9 @@ public class SettingActivity extends AppCompatActivity {
                 Intent intent = new Intent(getActivity(), WebviewActivity.class);
                 intent.putExtra("url","http://www.infomatter.cn");
                 startActivity(intent);
+            } else if (key.equals("edit_groups")) {
+                Intent intent = new Intent(getActivity(), GroupActivity.class);
+                startActivity(intent);
             }
             return super.onPreferenceTreeClick(preferenceScreen, preference);
         }

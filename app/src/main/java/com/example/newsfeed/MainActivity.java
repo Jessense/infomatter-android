@@ -22,6 +22,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -62,6 +63,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private Menu menu;
     private Spinner spinner;
     private String[] groups_default;
+    private int which_line; //0: All, 1: Recommendation, 2: Hot, 3: Group
+    private String selected_group;
+
     private int lastVisibleItem = 0;
     private int last_id = 1000000;
     private String last_time = "9999-12-31 23:59:59";
@@ -157,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 entryList = new ArrayList<>();
                 last_id = 0;
                 last_time = "9999-12-31 23:59:59";
-                getEntryList();
+                getEntryList1();
             }
         });
 
@@ -208,15 +212,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     user.setLogined(true);
                     user.setGroups2(data.getStringExtra("groups2"));
 
-
-                    //update spinner
-                    List<String> list = new ArrayList(Arrays.asList(groups_default));
-                    list.addAll(Arrays.asList(user.getGroups2()));
-                    String[] groups = list.toArray(new String[0]);
-                    ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                            (this, android.R.layout.simple_spinner_item, groups);
-                    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                    spinner.setAdapter(adapter);
+                    updateSpinner();
 
                     View navHeader = navigationView.getHeaderView(0);
                     TextView userName = navHeader.findViewById(R.id.user_name);
@@ -243,8 +239,19 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     OkHttpClient client = new OkHttpClient();
                     Log.d("MainActivity", "getEntryList1: last_time=" + last_time);
                     Log.d("MainActivity", "getEntryList1: last_id=" + last_id);
+                    String api_url = config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString();
+                    if (which_line == 0) {
+                        api_url += "/users/timeline_batch";
+                    } else if (which_line == 1) {
+                        api_url += "/users/recommendation";
+                    } else if (which_line == 2) {
+                        api_url += "/entries/hot";
+                    } else if (which_line == 3) {
+                        api_url += "/users/timeline_batch?group=" + selected_group;
+                    }
+                    Log.d("MainActivity", "run: api_url: " + api_url);
                     Request request = new Request.Builder()
-                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/timeline_batch")
+                            .url(api_url)
                             .addHeader("user_id", user.getId())
                             .addHeader("last_time", last_time)
                             .addHeader("last_id", String.valueOf(last_id))
@@ -273,8 +280,18 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     OkHttpClient client = new OkHttpClient();
                     Log.d("MainActivity", "getEntryList1: last_time=" + last_time);
                     Log.d("MainActivity", "getEntryList1: last_id=" + last_id);
+                    String api_url = config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString();
+                    if (which_line == 0) {
+                        api_url += "/users/timeline_batch";
+                    } else if (which_line == 1) {
+                        api_url += "/users/recommendation";
+                    } else if (which_line == 2) {
+                        api_url += "/entries/hot";
+                    } else if (which_line == 3) {
+                        api_url += "/users/timeline_batch?group=" + selected_group;
+                    }
                     Request request = new Request.Builder()
-                            .url(config.getScheme() + "://" + config.getHost() + ":" +config.getPort().toString() + "/users/timeline_batch")
+                            .url(api_url)
                             .addHeader("user_id", user.getId())
                             .addHeader("last_time", last_time)
                             .addHeader("last_id", String.valueOf(last_id))
@@ -326,44 +343,68 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-    //创建菜单
+//    //创建菜单
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.main,menu); //通过getMenuInflater()方法得到MenuInflater对象，再调用它的inflate()方法就可以给当前活动创建菜单了，第一个参数：用于指定我们通过哪一个资源文件来创建菜单；第二个参数：用于指定我们的菜单项将添加到哪一个Menu对象当中。
+//        this.menu = menu;
+//
+//        updateSpinner();
+//
+//        return true;
+//    }
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onPrepareOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main,menu); //通过getMenuInflater()方法得到MenuInflater对象，再调用它的inflate()方法就可以给当前活动创建菜单了，第一个参数：用于指定我们通过哪一个资源文件来创建菜单；第二个参数：用于指定我们的菜单项将添加到哪一个Menu对象当中。
+        this.menu = menu;
         MenuItem item = menu.findItem(R.id.spinner);
         spinner = (Spinner) MenuItemCompat.getActionView(item);
 
-        //update spinner
-        List<String> list = new ArrayList(Arrays.asList(groups_default));
-        list.addAll(Arrays.asList(user.getGroups2()));
-        String[] groups = list.toArray(new String[0]);
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_spinner_item, groups);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinner.setAdapter(adapter);
-
-        this.menu = menu;
-        return true;
+        updateSpinner();
+        return super.onPrepareOptionsMenu(menu);
     }
 
     public void updateSpinner() {
-        getMenuInflater().inflate(R.menu.main,menu); //通过getMenuInflater()方法得到MenuInflater对象，再调用它的inflate()方法就可以给当前活动创建菜单了，第一个参数：用于指定我们通过哪一个资源文件来创建菜单；第二个参数：用于指定我们的菜单项将添加到哪一个Menu对象当中。
-        MenuItem item = menu.findItem(R.id.spinner);
-        Spinner spinner = (Spinner) MenuItemCompat.getActionView(item);
+        List<String> list = new ArrayList(Arrays.asList(groups_default));
+        if (user.getGroups2()[0].length() > 0)
+            list.addAll(Arrays.asList(user.getGroups2()));
+        String[] groups = list.toArray(new String[0]);
+        ArrayAdapter<String> spin_adapter = new ArrayAdapter<String>
+                (this, android.R.layout.simple_spinner_item, groups);
+        spin_adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinner.setAdapter(spin_adapter);
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Log.d("MainActivity", "onItemSelected: " + parent.getItemAtPosition(position).toString());
+                Toast.makeText(parent.getContext(), "SpinnerSelectedListener: " + parent.getItemAtPosition(position).toString(), Toast.LENGTH_LONG);
+                String selected = parent.getItemAtPosition(position).toString();
+                if (position < 3) {
+                    which_line = position;
+                } else if (position >= 3) {
+                    which_line = 3;
+                    selected_group = selected;
+                    entryList = new ArrayList<>();
+                    last_id = 0;
+                    last_time = "9999-12-31 23:59:59";
+                    getEntryList1();
+                }
 
+            }
 
-        String[] groups_default = new String[] {"All", "Recommendation", "Popular"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>
-                (this, android.R.layout.simple_spinner_item, groups_default);
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
 
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-//                R.array.planets_array, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spinner.setAdapter(adapter);
+            }
+        });
     }
 
-
+    @Override
+    protected void onResume() {
+        invalidateOptionsMenu();
+        super.onResume();
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
