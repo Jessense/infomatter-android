@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     @Override
     protected void onResume() {
         super.onResume();
-        if (isSpinnerChanged()) {
+        if (isSpinnerChanged() && user.getLogined()) {
             invalidateOptionsMenu();
             changeSpinnerFlag("0");
         }
@@ -440,6 +440,10 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             startActivity(inent);
         } else if (id == R.id.nav_logout) {
             user.setLogined(false);
+            SharedPreferences preferences =getSharedPreferences("UserInfo",Context.MODE_PRIVATE);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.clear();
+            editor.commit();
             finish();
         }
 

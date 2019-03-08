@@ -169,6 +169,7 @@ public class LoginActivity extends AppCompatActivity {
                             intent.putExtra("name", name);
                             intent.putExtra("password", md5(password));
                             intent.putExtra("id", jsonObject.getString("id"));
+                            intent.putExtra("groups2", jsonObject.getString("groups2"));
                             Log.d("Login Activity", "run: Login SUCCESS");
                             showToast("Register Successful");
                             intent.putExtra("ed1", name);
