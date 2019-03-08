@@ -157,11 +157,15 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                adapter.resetList();
-                entryList = new ArrayList<>();
-                last_id = 0;
-                last_time = "9999-12-31 23:59:59";
-                getEntryList1();
+                if (entryList.size() > 0) {
+                    adapter.resetList();
+                    entryList = new ArrayList<>();
+                    last_id = 0;
+                    last_time = "9999-12-31 23:59:59";
+                    getEntryList1();
+                } else {
+                    swipeRefresh.setRefreshing(false);
+                }
             }
         });
 
@@ -385,12 +389,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 } else if (position >= 3) {
                     which_line = 3;
                     selected_group = selected;
-                    entryList = new ArrayList<>();
-                    last_id = 0;
-                    last_time = "9999-12-31 23:59:59";
-                    getEntryList1();
                 }
-
+                entryList = new ArrayList<>();
+                last_id = 0;
+                last_time = "2049-12-31 23:59:59";
+                getEntryList1();
             }
 
             @Override
@@ -402,8 +405,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     protected void onResume() {
-        invalidateOptionsMenu();
         super.onResume();
+        invalidateOptionsMenu();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")

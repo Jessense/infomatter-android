@@ -80,7 +80,7 @@ public class FollowingActivity extends AppCompatActivity {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                adapter = new SourceAdapter(sourceList, isSearching, getApplicationContext());
+                adapter = new SourceAdapter(sourceList, isSearching, FollowingActivity.this);
                 recyclerView.setAdapter(adapter);
             }
         });

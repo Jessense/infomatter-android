@@ -369,7 +369,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                     markAsRead(String.valueOf(entry.getId()));
                     PackageManager pm = context.getPackageManager();
                     boolean isChromeInstalled = isPackageInstalled("com.android.chrome", pm);
-                    if (entry.getContent().length() > entry.getDigest().length()) {
+                    if (entry.getDigest().length() > 0 && entry.getContent().length() > entry.getDigest().length()) {
                         Intent intent = new Intent(view.getContext(), WebviewActivity.class);
                         intent.putExtra("html",entry.getContent());
                         intent.putExtra("title", entry.getTitle());
@@ -658,14 +658,20 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public int getLastId() {
+        if (mEntryList.size() == 0)
+            return 0;
         return mEntryList.get(mEntryList.size()-1).getId();
     }
 
     public int getLastStarId() {
+        if (mEntryList.size() == 0)
+            return 0;
         return mEntryList.get(mEntryList.size()-1).getStar_id();
     }
 
     public String getLastTime() {
+        if (mEntryList.size() == 0)
+            return "9999-12-31T23:59:59.000Z";
         return mEntryList.get(mEntryList.size()-1).getTime();
     }
 

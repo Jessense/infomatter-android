@@ -65,6 +65,7 @@ public class GroupActivity extends AppCompatActivity {
         getGroupList();
     }
 
+
     private void addGroup(final String s) {
         new Thread(new Runnable() {
             @Override
@@ -81,7 +82,8 @@ public class GroupActivity extends AppCompatActivity {
                     if (responseData.equals("SUCCESS")) {
                         resetEdt();
                         user.addGroups2(s);
-                        adapter.addData(s);
+                        groupList.add(new Group(s));
+                        showResponse();
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -111,11 +113,12 @@ public class GroupActivity extends AppCompatActivity {
                         String[] groupsArray = user.getGroups2();
                         groupList.clear();
                         for (String groupString:groupsArray) {
-                            groupList.add(new Group(groupString));
+                            if (groupString.length() > 0)
+                                groupList.add(new Group(groupString));
                             Log.d("GroupActivity", "run: groupList" + groupList.get(0).getGroupName());
-                            showResponse();
                         }
                     }
+                    showResponse();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

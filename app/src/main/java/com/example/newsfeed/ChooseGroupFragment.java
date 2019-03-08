@@ -3,6 +3,7 @@ package com.example.newsfeed;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -48,6 +49,7 @@ public class ChooseGroupFragment extends DialogFragment {
 //        View dialogView = getActivity().getLayoutInflater().inflate(R.layout.choose_group, null);
         final AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         // Set the dialog title
+        Log.d(TAG, "onCreateDialog: ChooseGroup: " + user.getGroups2().toString());
         builder.setTitle("Choose groups")
                 // Specify the list array, the items to be selected by default (null for none),
                 // and the listener through which to receive callbacks when items are selected
@@ -88,7 +90,8 @@ public class ChooseGroupFragment extends DialogFragment {
                 .setNeutralButton("Add", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
+                        Intent intent = new Intent(getContext(), GroupActivity.class);
+                        startActivity(intent);
                     }
                 });
 //        final EditText add_edt = (EditText) dialogView.findViewById(R.id.add_group_edt);

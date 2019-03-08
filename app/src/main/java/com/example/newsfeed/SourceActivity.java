@@ -107,11 +107,15 @@ public class SourceActivity extends AppCompatActivity {
         swipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                adapter.resetList();
-                entryList = new ArrayList<>();
-                last_id = 0;
-                last_time = "9999-12-31 23:59:59";
-                getEntryList();
+                if (entryList.size() > 0) {
+                    adapter.resetList();
+                    entryList = new ArrayList<>();
+                    last_id = 0;
+                    last_time = "9999-12-31 23:59:59";
+                    getEntryList1();
+                } else {
+                    swipeRefresh.setRefreshing(false);
+                }
             }
         });
     }
