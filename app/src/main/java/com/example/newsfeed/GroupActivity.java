@@ -1,6 +1,7 @@
 package com.example.newsfeed;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.media.Image;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -65,6 +66,12 @@ public class GroupActivity extends AppCompatActivity {
         getGroupList();
     }
 
+    @Override
+    protected void onStop() {
+        changeSpinnerFlag("1");
+        super.onStop();
+
+    }
 
     private void addGroup(final String s) {
         new Thread(new Runnable() {
@@ -165,5 +172,13 @@ public class GroupActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    public void changeSpinnerFlag(String s) {
+        SharedPreferences sp = getSharedPreferences("Spinner", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("spinner_changed","");    // 先清空原始数据
+        editor.putString("spinner_changed",s);
+        editor.commit();
     }
 }

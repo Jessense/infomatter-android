@@ -10,10 +10,5 @@
         android:summary="Questions frequently asked and tutorials"/>
     <Preference
         android:title="About"
-        android:key="about"
-        android:summary="About infomatter"/>
-    <Preference
-        android:title="Check for updates"
-        android:key="updates"
-        android:summary="Current version: 0.99.1"/>
+        android:key="about"/>
 </PreferenceScreen>

@@ -10,6 +10,6 @@
         app:showAsAction="always" />
     <item android:id="@+id/search"
         android:title="Search"
-        android:icon="@drawable/ic_action_search"
+        android:icon="@drawable/ic_search_black_24dp"
         app:showAsAction="ifRoom"/>
 </menu>

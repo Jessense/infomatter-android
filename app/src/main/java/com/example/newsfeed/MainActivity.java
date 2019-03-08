@@ -3,6 +3,7 @@ package com.example.newsfeed;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
@@ -236,6 +237,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void getEntryList1() {
+
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -347,7 +349,16 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         }
     }
 
-//    //创建菜单
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isSpinnerChanged()) {
+            invalidateOptionsMenu();
+            changeSpinnerFlag("0");
+        }
+    }
+
+    //    //创建菜单
 //    @Override
 //    public boolean onCreateOptionsMenu(Menu menu) {
 //        getMenuInflater().inflate(R.menu.main,menu); //通过getMenuInflater()方法得到MenuInflater对象，再调用它的inflate()方法就可以给当前活动创建菜单了，第一个参数：用于指定我们通过哪一个资源文件来创建菜单；第二个参数：用于指定我们的菜单项将添加到哪一个Menu对象当中。
@@ -359,7 +370,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 //    }
 
     @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.main,menu); //通过getMenuInflater()方法得到MenuInflater对象，再调用它的inflate()方法就可以给当前活动创建菜单了，第一个参数：用于指定我们通过哪一个资源文件来创建菜单；第二个参数：用于指定我们的菜单项将添加到哪一个Menu对象当中。
         this.menu = menu;
         MenuItem item = menu.findItem(R.id.spinner);
@@ -393,6 +404,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 entryList = new ArrayList<>();
                 last_id = 0;
                 last_time = "2049-12-31 23:59:59";
+                swipeRefresh.setRefreshing(true);
                 getEntryList1();
             }
 
@@ -401,12 +413,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
             }
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        invalidateOptionsMenu();
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -457,6 +463,22 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         public Bitmap getCacheImage(String url) {
             return null;
         }
+    }
+
+    public Boolean isSpinnerChanged() {
+        SharedPreferences sp = getSharedPreferences("Spinner", MODE_PRIVATE);
+        String result = sp.getString("spinner_changed", "");
+        if (result.equals("1"))
+            return true;
+        return false;
+    }
+
+    public void changeSpinnerFlag(String s) {
+        SharedPreferences sp = getSharedPreferences("Spinner", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("spinner_changed","");    // 先清空原始数据
+        editor.putString("spinner_changed",s);
+        editor.commit();
     }
 
 }

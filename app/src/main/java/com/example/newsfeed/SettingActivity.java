@@ -38,16 +38,11 @@ public class SettingActivity extends AppCompatActivity {
         public boolean onPreferenceTreeClick(PreferenceScreen preferenceScreen, Preference preference) {
             String key = preference.getKey();
             if (key.equals("about")) {
-                Intent intent = new Intent(getActivity(), WebviewActivity.class);
-                intent.putExtra("url","http://www.infomatter.cn");
+                Intent intent = new Intent(getActivity(), AboutActivity.class);
                 startActivity(intent);
             } else if (key.equals("help")) {
                 Intent intent = new Intent(getActivity(), WebviewActivity.class);
-                intent.putExtra("url","http://www.infomatter.cn");
-                startActivity(intent);
-            } else if (key.equals("updates")) {
-                Intent intent = new Intent(getActivity(), WebviewActivity.class);
-                intent.putExtra("url","http://www.infomatter.cn");
+                intent.putExtra("url","http://www.infomatter.cn/help");
                 startActivity(intent);
             } else if (key.equals("edit_groups")) {
                 Intent intent = new Intent(getActivity(), GroupActivity.class);
