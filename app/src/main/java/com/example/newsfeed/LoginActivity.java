@@ -53,13 +53,18 @@ public class LoginActivity extends AppCompatActivity {
 
                 name=ed1.getText().toString().trim();
                 password=ed2.getText().toString().trim();
-                if (name.length() >=3 && name.length() <= 16 && password.length() >= 6 && password.length() <= 16 ) {
-                    Log.d("LoginActivity", "ed1: "+name);
-                    //通过okhttp发起post请求
-                    postLoginRequest(name,password);
+                if (isLeagal(name) && isLeagal(password)) {
+                    if (name.length() >=3 && name.length() <= 16 && password.length() >= 6 && password.length() <= 16 ) {
+                        Log.d("LoginActivity", "ed1: "+name);
+                        //通过okhttp发起post请求
+                        postLoginRequest(name,password);
+                    } else {
+                        showToast("require: name length 3~16 and password length 6~16");
+                    }
                 } else {
-                    showToast("require: name length 3~16 and password length 6~16");
+                    showToast("Illegal input!");
                 }
+
 
             }
         });
@@ -70,13 +75,18 @@ public class LoginActivity extends AppCompatActivity {
 
                 name=ed1.getText().toString().trim();
                 password=ed2.getText().toString().trim();
-                if (name.length() >=3 && name.length() <= 16 && password.length() >= 6 && password.length() <= 16 ) {
-                    Log.d("LoginActivity", "ed1: "+name);
-                    //通过okhttp发起post请求
-                    postRegisterRequest(name,password);
+                if (isLeagal(name) && isLeagal(password)) {
+                    if (name.length() >=3 && name.length() <= 16 && password.length() >= 6 && password.length() <= 16 ) {
+                        Log.d("LoginActivity", "ed1: "+name);
+                        //通过okhttp发起post请求
+                        postRegisterRequest(name,password);
+                    } else {
+                        showToast("require: name length 3~16 and password length 6~16");
+                    }
                 } else {
-                    showToast("require: name length 3~16 and password length 6~16");
+                    showToast("Illegal input!");
                 }
+
 
             }
         });
@@ -180,6 +190,9 @@ public class LoginActivity extends AppCompatActivity {
                     } else if(responseData.equals("EXISTED")){
                         Log.d("LoginActivity", "run: username EXISTED");
                         showToast("Username Existed!");
+                    } else if(responseData.equals("FULL")){
+                        Log.d("LoginActivity", "run: username EXISTED");
+                        showToast("Registration channel is closed temporarily!");
                     } else {
                         Log.d("LoginActivity", "run: register FAILURE");
                         showToast("Register Failed");
@@ -232,5 +245,15 @@ public class LoginActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public static boolean isLeagal(String s) {
+        Character[] characters = new Character[]{'\'', '\"', '(', ')', '[', ']', ' ','$', '%', ',', '|', '&', '?', '/'};
+        for (Character character:characters) {
+            if (s.indexOf(character) >= 0) {
+                return false;
+            }
+        }
+        return true;
     }
 }

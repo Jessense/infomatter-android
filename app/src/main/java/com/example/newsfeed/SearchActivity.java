@@ -54,7 +54,10 @@ public class SearchActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setHasFixedSize(true);
         sourceList = new ArrayList<>();
-        getSearchResult(query);
+        if (LoginActivity.isLeagal(query))
+            getSearchResult(query);
+        else
+            Toast.makeText(SearchActivity.this, "Illegal input!", Toast.LENGTH_LONG).show();
 
 
 
@@ -65,7 +68,10 @@ public class SearchActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new Search.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(CharSequence query) {
-                getSearchResult((String) query);
+                if (LoginActivity.isLeagal((String) query))
+                    getSearchResult((String) query);
+                else
+                    Toast.makeText(SearchActivity.this, "Illegal input!", Toast.LENGTH_LONG).show();
                 return true;
             }
 

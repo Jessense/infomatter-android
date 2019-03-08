@@ -42,7 +42,7 @@ public class SettingActivity extends AppCompatActivity {
                 startActivity(intent);
             } else if (key.equals("help")) {
                 Intent intent = new Intent(getActivity(), WebviewActivity.class);
-                intent.putExtra("url","http://www.infomatter.cn/help");
+                intent.putExtra("url","http://blog.infomatter.cn/page/custom/2");
                 startActivity(intent);
             } else if (key.equals("edit_groups")) {
                 Intent intent = new Intent(getActivity(), GroupActivity.class);

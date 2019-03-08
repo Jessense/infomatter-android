@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -52,8 +53,10 @@ public class GroupActivity extends AppCompatActivity {
         add_group_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (add_group_edt.getText().toString().length() > 0) {
+                if (add_group_edt.getText().toString().length() > 0 && LoginActivity.isLeagal(add_group_edt.getText().toString())) {
                     addGroup(add_group_edt.getText().toString());
+                } else {
+                    Toast.makeText(GroupActivity.this, "Illegal input!", Toast.LENGTH_LONG).show();
                 }
             }
         });

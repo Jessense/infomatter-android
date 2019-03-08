@@ -25,7 +25,7 @@ public class AboutActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AboutActivity.this, WebviewActivity.class);
-                intent.putExtra("url","http://www.infomatter.cn");
+                intent.putExtra("url","http://blog.infomatter.cn/page/custom/1");
                 startActivity(intent);
             }
         });

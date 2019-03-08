@@ -68,10 +68,15 @@ public class GroupAdapter extends RecyclerView.Adapter<GroupAdapter.ViewHolder> 
         viewHolder.rename_btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (viewHolder.groupName.getText().toString() != group.getGroupName() && viewHolder.groupName.getText().toString().length() > 0) {
-                    viewHolder.groupName.clearFocus();
-                    editGroup(group.getGroupName(), viewHolder.groupName.getText().toString(), i);
+                if (LoginActivity.isLeagal(viewHolder.groupName.getText().toString())) {
+                    if (viewHolder.groupName.getText().toString() != group.getGroupName() && viewHolder.groupName.getText().toString().length() > 0) {
+                        viewHolder.groupName.clearFocus();
+                        editGroup(group.getGroupName(), viewHolder.groupName.getText().toString(), i);
+                    }
+                } else {
+                    Toast.makeText(context, "Illegal input!", Toast.LENGTH_LONG).show();
                 }
+
             }
         });
     }

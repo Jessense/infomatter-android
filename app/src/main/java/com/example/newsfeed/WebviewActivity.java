@@ -67,7 +67,7 @@ public class WebviewActivity extends AppCompatActivity {
             String source_name = intent.getStringExtra("source_name");
             String time = intent.getStringExtra("time");
 
-            String header = "<h2>" + title + "</h2>" + "<i>" + source_name + " / " + time + "</i><p>";
+            String header = "<h2>" + "<a href=\"" + url + "\" style=\"color:#000000\">" + title + "</a>" + "</h2>" + "<i>" + source_name + " / " + time + "</i><p>";
             String css = "<style>p{font-size :16px !important;line-height:30px !important}</style><style>a{color:#4285F4; text-decoration:none}</style><body style=\"margin: 0; padding: 20\">";
 
             webView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
