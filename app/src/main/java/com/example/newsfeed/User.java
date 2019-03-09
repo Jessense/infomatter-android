@@ -65,8 +65,10 @@ public class User {
             groups[0] = groups[0].substring(1);
             groups[groups.length - 1] = groups[groups.length - 1].substring(0, groups[groups.length - 1].length() - 1);
             Log.d(TAG, "getGroups2: groups2: " + groups);
+            return groups;
+        } else {
+            return new String[]{};
         }
-        return groups;
     }
 
     public void setName(String name) {

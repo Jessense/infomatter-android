@@ -330,6 +330,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                     share_intent.setType("text/plain");
                                     share_intent.putExtra(Intent.EXTRA_TEXT, entry.getTitle() + "\n" + entry.getLink());
                                     share_intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
+                                    share_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     context.startActivity(share_intent);
                                     return true;
                                 default:
@@ -503,6 +504,7 @@ public class EntryAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                     share_intent.setType("text/plain");
                                     share_intent.putExtra(Intent.EXTRA_TEXT, entry.getTitle() + "\n" + entry.getLink());
                                     share_intent.putExtra(Intent.EXTRA_SUBJECT, entry.getTitle());
+                                    share_intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                     context.startActivity(share_intent);
                                     return true;
                                 default:

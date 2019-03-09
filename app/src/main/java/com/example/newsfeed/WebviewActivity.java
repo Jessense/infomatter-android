@@ -6,6 +6,7 @@ import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.ViewGroup;
@@ -37,6 +38,7 @@ public class WebviewActivity extends AppCompatActivity {
     private String title;
     private String url;
     private Boolean starred;
+    private WebView webView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +61,7 @@ public class WebviewActivity extends AppCompatActivity {
         getSupportActionBar().setTitle(title);
 
 
-        WebView webView = (WebView) findViewById(R.id.webView1);
+        webView = (WebView) findViewById(R.id.webView1);
         webView.getSettings().setJavaScriptEnabled(true);
         CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
         webView.setWebViewClient(new WebViewClient());
@@ -68,38 +70,15 @@ public class WebviewActivity extends AppCompatActivity {
             String time = intent.getStringExtra("time");
 
             String header = "<h2>" + "<a href=\"" + url + "\" style=\"color:#000000\">" + title + "</a>" + "</h2>" + "<i>" + source_name + " / " + time + "</i><p>";
-            String css = "<style>p{font-size :16px !important;line-height:30px !important}</style><style>a{color:#4285F4; text-decoration:none}</style><body style=\"margin: 0; padding: 20\">";
+            String css = "<style>p{font-size :16px !important;line-height:30px !important}</style><style>a{color:#4285F4; text-decoration:none}</style><body style=\"margin: 0; padding: 20\"><style>img{max-width: 100%; width:auto; height: auto;}</style>";
 
             webView.setScrollBarStyle(WebView.SCROLLBARS_INSIDE_OVERLAY);
 
-            WebSettings webSettings = webView.getSettings();//获取webview设置属性
-            webSettings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.SINGLE_COLUMN);//把html中的内容放大webview等宽的一列中
-
-
-//            ViewGroup.MarginLayoutParams p = (ViewGroup.MarginLayoutParams) webView.getLayoutParams();
-//            p.leftMargin = 20;
-//            p.rightMargin = 20;
-//            webView.setLayoutParams(p);
-
-            webView.loadData(header + getNewContent(html) + css, "text/html", "UTF-8");
+            webView.loadData(header + html + css, "text/html", "UTF-8");
         } else {
             webView.loadUrl(url);
         }
 
-    }
-
-    public static String getNewContent(String htmltext){
-        try {
-            Document doc= Jsoup.parse(htmltext);
-            Elements elements=doc.getElementsByTag("img");
-            for (Element element : elements) {
-                element.attr("width","100%").attr("height","auto");
-            }
-
-            return doc.toString();
-        } catch (Exception e) {
-            return htmltext;
-        }
     }
 
     @Override
@@ -291,5 +270,22 @@ public class WebviewActivity extends AppCompatActivity {
             }
 
         }
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            switch (keyCode) {
+                case KeyEvent.KEYCODE_BACK:
+                    if (webView.canGoBack()) {
+                        webView.goBack();
+                    } else {
+                        finish();
+                    }
+                    return true;
+            }
+
+        }
+        return super.onKeyDown(keyCode, event);
     }
 }

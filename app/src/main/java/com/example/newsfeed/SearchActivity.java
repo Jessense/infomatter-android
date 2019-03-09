@@ -149,7 +149,7 @@ public class SearchActivity extends AppCompatActivity {
             @Override
             public void run() {
                 Log.d(TAG, "onCreate: SearchActivity showResponse");
-                adapter = new SourceAdapter(sourceList, isSearching, getApplicationContext());
+                adapter = new SourceAdapter(sourceList, isSearching, SearchActivity.this);
                 recyclerView.setAdapter(adapter);
             }
         });

@@ -382,8 +382,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     public void updateSpinner() {
         List<String> list = new ArrayList(Arrays.asList(groups_default));
-        if (user.getGroups2()[0].length() > 0)
-            list.addAll(Arrays.asList(user.getGroups2()));
+        list.addAll(Arrays.asList(user.getGroups2()));
         String[] groups = list.toArray(new String[0]);
         ArrayAdapter<String> spin_adapter = new ArrayAdapter<String>
                 (this, android.R.layout.simple_spinner_item, groups);
