@@ -19,5 +19,5 @@
         <item>Uranus</item>
         <item>Neptune</item>
     </string-array>
-    <string name="version_num">v1.0 Alpha 2</string>
+    <string name="version_num">v1.0 Alpha 3</string>
 </resources>

@@ -71,7 +71,9 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     private int last_id = 1000000;
     private String last_time = "9999-12-31 23:59:59";
     private int batch_size = 15;
+    private Boolean hasBeenLoading = false;
     private NavigationView navigationView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +126,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 @Override
                 public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                     super.onScrollStateChanged(recyclerView, newState);
-                    if (adapter.isHasMore() == true && ((lastVisibleItem == adapter.getItemCount() - 5) || (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem == adapter.getItemCount() - 1))) {
+                    if ( !hasBeenLoading && adapter.isHasMore() == true && (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem == adapter.getItemCount() - 1)) {
                         last_time = adapter.getLastTime();
                         last_id = adapter.getLastId();
                         DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_DATE_TIME;
@@ -241,6 +243,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         new Thread(new Runnable() {
             @Override
             public void run() {
+                hasBeenLoading = true;
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Log.d("MainActivity", "getEntryList1: last_time=" + last_time);
@@ -273,6 +276,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     e.printStackTrace();
                 }
                 swipeRefresh.setRefreshing(false);
+                hasBeenLoading = false;
             }
         }).start();
     }
@@ -282,6 +286,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         new Thread(new Runnable() {
             @Override
             public void run() {
+                hasBeenLoading = true;
                 try {
                     OkHttpClient client = new OkHttpClient();
                     Log.d("MainActivity", "getEntryList1: last_time=" + last_time);
@@ -312,6 +317,7 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     e.printStackTrace();
                 }
                 swipeRefresh.setRefreshing(false);
+                hasBeenLoading = false;
             }
         }).start();
     }
@@ -396,10 +402,12 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                 String selected = parent.getItemAtPosition(position).toString();
                 if (position < 3) {
                     which_line = position;
+                    Log.d("MainActivity", "onItemSelected: " + position);
                 } else if (position >= 3) {
                     which_line = 3;
                     selected_group = selected;
                 }
+                Log.d("MainActivity", "onItemSelected: " + selected);
                 entryList = new ArrayList<>();
                 last_id = 0;
                 last_time = "2049-12-31 23:59:59";

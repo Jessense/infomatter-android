@@ -96,24 +96,10 @@ public class Entry {
         String pub_hour;
         String pub_minute = String.format("%02d", localPubDate.getMinute());
 
-        if (this.id <= 142052) {
-            if (localPubDate.plusHours(8).isAfter(localDate)) {
-                pub_year  = String.format("%04d", localPubDate.getYear());
-                pub_month = String.format("%02d", localPubDate.getMonthValue());
-                pub_day   = String.format("%02d", localPubDate.getDayOfMonth());
-                pub_hour = String.format("%02d", localPubDate.getHour());
-            } else {
-                pub_year  = String.format("%04d", localPubDate.plusHours(8).getYear());
-                pub_month = String.format("%02d", localPubDate.plusHours(8).getMonthValue());
-                pub_day   = String.format("%02d", localPubDate.plusHours(8).getDayOfMonth());
-                pub_hour = String.format("%02d", localPubDate.plusHours(8).getHour());
-            }
-        } else {
-            pub_year  = String.format("%04d", localPubDate.getYear());
-            pub_month = String.format("%02d", localPubDate.getMonthValue());
-            pub_day   = String.format("%02d", localPubDate.getDayOfMonth());
-            pub_hour = String.format("%02d", localPubDate.getHour());
-        }
+        pub_year  = String.format("%04d", localPubDate.getYear());
+        pub_month = String.format("%02d", localPubDate.getMonthValue());
+        pub_day   = String.format("%02d", localPubDate.getDayOfMonth());
+        pub_hour = String.format("%02d", localPubDate.getHour());
 
 
 

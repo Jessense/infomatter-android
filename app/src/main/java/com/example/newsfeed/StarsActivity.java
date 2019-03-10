@@ -59,7 +59,7 @@ public class StarsActivity extends AppCompatActivity {
             @Override
             public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
                 super.onScrollStateChanged(recyclerView, newState);
-                if (adapter.isHasMore() == true && ((lastVisibleItem == adapter.getItemCount() - 5) || (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem == adapter.getItemCount() - 1))) {
+                if (adapter.isHasMore() == true && (newState == RecyclerView.SCROLL_STATE_IDLE && lastVisibleItem == adapter.getItemCount() - 1)) {
                     last_id = adapter.getLastStarId();
                     Log.d("MainActivity", "onScrollStateChanged: last_id=" + last_id);
                     getStarsList();
