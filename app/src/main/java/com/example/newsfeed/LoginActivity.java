@@ -248,7 +248,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public static boolean isLeagal(String s) {
-        Character[] characters = new Character[]{'\'', '\"', '(', ')', '[', ']', ' ','$', '%', ',', '|', '&', '?', '/'};
+        Character[] characters = new Character[]{'\'', '\"', '(', ')', '[', ']', ' ','$', '%', ',', '|', '&', '?'};
         for (Character character:characters) {
             if (s.indexOf(character) >= 0) {
                 return false;

@@ -302,6 +302,10 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
             source = params[0];
             try {
                 OkHttpClient client = new OkHttpClient();
+                String temp = "";
+                if (source.getPhoto().length() > 0) {
+                    temp += source.getPhoto();
+                }
                 RequestBody formBody = new FormBody.Builder()
                         .add("name", source.getName())
                         .add("link",source.getLink())
@@ -315,6 +319,7 @@ public class SourceAdapter extends RecyclerView.Adapter<SourceAdapter.ViewHolder
                         .build();
                 Response response = client.newCall(request).execute();
                 String responseData = response.body().string();
+                Log.d(TAG, "doInBackground: add response: " + responseData);
                 Gson gson = new Gson();
                 JSONArray jsonArray = new JSONArray(responseData);
                 JSONObject jsonObject = jsonArray.getJSONObject(0);
