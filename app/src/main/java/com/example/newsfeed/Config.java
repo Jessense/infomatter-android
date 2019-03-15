@@ -3,7 +3,7 @@ package com.example.newsfeed;
 
 public class Config {
     private String scheme = "http";
-    private String host = ""; //主机ip
+    private String host = "39.105.127.55"; //主机ip
     private Integer port = 3000; //后端程序运行的端口
     private Integer pub_rsshub_port = 1200;
 
